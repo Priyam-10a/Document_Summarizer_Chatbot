@@ -1,0 +1,56 @@
+Artificial intelligence is transforming industries worldwide.
+Machine learning allows computers to learn from data without being explicitly programmed.
+Deep learning uses multi-layered neural networks to process complex patterns.
+Natural language processing enables computers to understand and generate human language.
+RAG stands for Retrieval Augmented Generation.
+It combines a retrieval system with a language model to generate accurate answers.
+Vector databases store high-dimensional embeddings for fast similarity search.
+ChromaDB is an open-source vector database that runs locally.
+LangChain is a framework for building applications powered by language models.
+Ollama allows you to run large language models locally on your own hardware.
+Sentence transformers convert text into dense vector representations.
+These vectors capture the semantic meaning of the text.Artificial intelligence is transforming industries worldwide.
+Machine learning allows computers to learn from data without being explicitly programmed.
+Deep learning uses multi-layered neural networks to process complex patterns.
+Natural language processing enables computers to understand and generate human language.
+RAG stands for Retrieval Augmented Generation.
+It combines a retrieval system with a language model to generate accurate answers.
+Vector databases store high-dimensional embeddings for fast similarity search.
+ChromaDB is an open-source vector database that runs locally.
+LangChain is a framework for building applications powered by language models.
+Ollama allows you to run large language models locally on your own hardware.
+Sentence transformers convert text into dense vector representations.
+These vectors capture the semantic meaning of the text.Artificial intelligence is transforming industries worldwide.
+Machine learning allows computers to learn from data without being explicitly programmed.
+Deep learning uses multi-layered neural networks to process complex patterns.
+Natural language processing enables computers to understand and generate human language.
+RAG stands for Retrieval Augmented Generation.
+It combines a retrieval system with a language model to generate accurate answers.
+Vector databases store high-dimensional embeddings for fast similarity search.
+ChromaDB is an open-source vector database that runs locally.
+LangChain is a framework for building applications powered by language models.
+Ollama allows you to run large language models locally on your own hardware.
+Sentence transformers convert text into dense vector representations.
+These vectors capture the semantic meaning of the text.Artificial intelligence is transforming industries worldwide.
+Machine learning allows computers to learn from data without being explicitly programmed.
+Deep learning uses multi-layered neural networks to process complex patterns.
+Natural language processing enables computers to understand and generate human language.
+RAG stands for Retrieval Augmented Generation.
+It combines a retrieval system with a language model to generate accurate answers.
+Vector databases store high-dimensional embeddings for fast similarity search.
+ChromaDB is an open-source vector database that runs locally.
+LangChain is a framework for building applications powered by language models.
+Ollama allows you to run large language models locally on your own hardware.
+Sentence transformers convert text into dense vector representations.
+These vectors capture the semantic meaning of the text.Artificial intelligence is transforming industries worldwide.
+Machine learning allows computers to learn from data without being explicitly programmed.
+Deep learning uses multi-layered neural networks to process complex patterns.
+Natural language processing enables computers to understand and generate human language.
+RAG stands for Retrieval Augmented Generation.
+It combines a retrieval system with a language model to generate accurate answers.
+Vector databases store high-dimensional embeddings for fast similarity search.
+ChromaDB is an open-source vector database that runs locally.
+LangChain is a framework for building applications powered by language models.
+Ollama allows you to run large language models locally on your own hardware.
+Sentence transformers convert text into dense vector representations.
+These vectors capture the semantic meaning of the text.
