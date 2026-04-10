@@ -5,5 +5,7 @@ chromadb
 sentence-transformers
 pypdf
 python-docx
-streamlit
+fastapi
+uvicorn
+python-multipart
 tiktoken

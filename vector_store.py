@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 from document_loader import load_and_chunk
 
 # ── Setup ────────────────────────────────────────────────────
-CHROMA_PATH = "C:\\doc-summarizer-agent\\chroma_db"
+CHROMA_PATH = "./chroma_db"
 EMBED_MODEL  = "all-MiniLM-L6-v2"
 
 # Load the embedding model once (reused across functions)
