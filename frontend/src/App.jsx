@@ -1,227 +1,385 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { 
-  UploadCloud, FileText, Send, User, Bot, 
-  Trash2, FileJson, List, Hash, AlignLeft
+import {
+  Plus, Trash2, Send, UploadCloud, FileText,
+  Bot, User, MessageSquare, ChevronRight, X,
+  Pencil, Check
 } from 'lucide-react';
 import './index.css';
 
-const API_BASE = 'http://localhost:8000';
+const API = 'http://localhost:8000';
 
-function App() {
-  const [docLoaded, setDocLoaded] = useState(false);
-  const [docInfo, setDocInfo] = useState({});
-  const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
-  
-  const fileInputRef = useRef(null);
-  const chatEndRef = useRef(null);
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    // Check status on load
-    axios.get(`${API_BASE}/status`)
-      .then(res => {
-        setDocLoaded(res.data.doc_loaded);
-        if (res.data.doc_loaded) {
-          setDocInfo(res.data.doc_info);
-        }
-      })
-      .catch(err => console.error("Error checking status:", err));
-  }, []);
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'Just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+// ─────────────────────────────────────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+function ConvItem({ conv, active, onSelect, onDelete, onRename }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(conv.title);
+  const inputRef = useRef(null);
 
-    setIsProcessing(true);
-    const formData = new FormData();
-    formData.append('file', file);
+  useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
 
-    try {
-      const res = await axios.post(`${API_BASE}/upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setDocInfo(res.data.doc_info);
-      setDocLoaded(true);
-      setMessages([]); // Clear chat on new document
-    } catch (error) {
-      console.error("Upload error:", error);
-      alert("Error uploading document: " + (error.response?.data?.detail || error.message));
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleSendMessage = async (customMessage = null) => {
-    const messageToSend = customMessage || inputText;
-    if (!messageToSend.trim()) return;
-
-    // Add user message
-    const newMessages = [...messages, { role: 'user', content: messageToSend }];
-    setMessages(newMessages);
-    if (!customMessage) setInputText('');
-    setIsTyping(true);
-
-    try {
-      const res = await axios.post(`${API_BASE}/chat`, { message: messageToSend });
-      setMessages([...newMessages, { role: 'agent', content: res.data.response }]);
-    } catch (error) {
-      setMessages([...newMessages, { 
-        role: 'agent', 
-        content: `⚠️ Error: ${error.response?.data?.detail || error.message}` 
-      }]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
-  const clearChat = () => {
-    setMessages([]);
-  };
+  function commitRename() {
+    if (draft.trim() && draft !== conv.title) onRename(conv.id, draft.trim());
+    setEditing(false);
+  }
 
   return (
-    <div className="app-container">
-      {/* Sidebar */}
-      <aside className="sidebar glass-panel">
-        <div className="brand">
-          <Bot size={32} color="var(--accent-primary)" />
-          InferaDoc
-        </div>
-        <div className="subtitle">AI Document Assistant</div>
+    <div
+      className={`conv-item ${active ? 'conv-active' : ''}`}
+      onClick={() => !editing && onSelect(conv.id)}
+    >
+      <MessageSquare size={15} className="conv-icon" />
 
-        <div className="section-title">Upload Document</div>
-        <div 
-          className={`upload-zone ${isProcessing ? 'processing' : ''}`}
-          onClick={() => !isProcessing && fileInputRef.current.click()}
-        >
-          <UploadCloud className="upload-icon" size={36} />
-          <div className="upload-text">
-            {isProcessing ? 'Processing Document...' : 'Click or Drag to Upload'}
-          </div>
-          <div className="upload-subtext">Supports PDF, DOCX, TXT</div>
-          <input 
-            type="file" 
-            ref={fileInputRef}
-            className="file-input-hidden" 
-            accept=".pdf,.docx,.txt"
-            onChange={handleFileUpload}
-            disabled={isProcessing}
+      <div className="conv-body">
+        {editing ? (
+          <input
+            ref={inputRef}
+            className="conv-rename-input"
+            value={draft}
+            onChange={e => setDraft(e.target.value)}
+            onBlur={commitRename}
+            onKeyDown={e => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') setEditing(false); }}
+            onClick={e => e.stopPropagation()}
           />
-        </div>
-
-        {docLoaded && (
+        ) : (
           <>
-            <div className="doc-card">
-              <FileJson className="doc-icon" size={24} />
-              <div className="doc-details">
-                <div className="doc-name" title={docInfo.name}>{docInfo.name}</div>
-                <div className="doc-meta">{docInfo.type} • {docInfo.size}</div>
-              </div>
-            </div>
-
-            <div className="section-title">Quick Actions</div>
-            <div className="quick-actions">
-              <button className="action-btn" onClick={() => handleSendMessage("Give me a full summary")} disabled={isTyping}>
-                <List size={18} color="var(--accent-primary)"/> Give me a full summary
-              </button>
-              <button className="action-btn" onClick={() => handleSendMessage("What are the key points?")} disabled={isTyping}>
-                <Hash size={18} color="#0ea5e9"/> What are the key points?
-              </button>
-              <button className="action-btn" onClick={() => handleSendMessage("What is the main topic?")} disabled={isTyping}>
-                <FileText size={18} color="#10b981"/> What is the main topic?
-              </button>
-              <button className="action-btn" onClick={() => handleSendMessage("List the important details")} disabled={isTyping}>
-                <AlignLeft size={18} color="#f59e0b"/> List the important details
-              </button>
-            </div>
+            <span className="conv-title">{conv.title}</span>
+            <span className="conv-time">{timeAgo(conv.updated_at)}</span>
           </>
         )}
+      </div>
 
-        <button 
-          className="btn btn-secondary mt-auto" 
-          onClick={clearChat}
-          style={{ marginTop: 'auto' }}
-        >
-          <Trash2 size={18} /> Clear Chat
-        </button>
-      </aside>
-
-      {/* Main Chat Area */}
-      <main className="main-area glass-panel">
-        {!docLoaded ? (
-          <div className="welcome-screen">
-            <Bot className="welcome-icon" size={80} />
-            <div className="welcome-title">Upload a document to begin</div>
-            <p>Ask questions, get summaries, and explore your content.</p>
-          </div>
-        ) : messages.length === 0 ? (
-           <div className="welcome-screen">
-             <div className="welcome-title text-accent">📄 {docInfo.name} is ready</div>
-             <p>Ask anything about the document</p>
-           </div>
-        ) : (
-          <div className="chat-container">
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`message ${msg.role === 'user' ? 'msg-user' : 'msg-agent'}`}>
-                <div className="msg-label">
-                  {msg.role === 'user' ? (
-                    <>You <User size={14} /></>
-                  ) : (
-                    <><Bot size={14} /> InferaDoc</>
-                  )}
-                </div>
-                <div className="msg-bubble">{msg.content}</div>
-              </div>
-            ))}
-            {isTyping && (
-              <div className="message msg-agent">
-                <div className="msg-label"><Bot size={14} /> InferaDoc</div>
-                <div className="msg-bubble typing-indicator">
-                  <div className="dot"></div>
-                  <div className="dot"></div>
-                  <div className="dot"></div>
-                </div>
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
-        )}
-
-        {/* Input Area */}
-        <div className="input-area">
-          <div className="input-container">
-            <textarea
-              className="chat-input"
-              placeholder={docLoaded ? "Ask something about the document..." : "Upload a document first..."}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              disabled={!docLoaded || isTyping}
-              rows={1}
-            />
-            <button 
-              className="send-btn" 
-              onClick={() => handleSendMessage()}
-              disabled={!docLoaded || isTyping || !inputText.trim()}
-            >
-              <Send size={20} />
-            </button>
-          </div>
-        </div>
-      </main>
+      <div className="conv-actions" onClick={e => e.stopPropagation()}>
+        {editing
+          ? <button className="icon-btn" onClick={commitRename}><Check size={13} /></button>
+          : <button className="icon-btn" onClick={() => setEditing(true)}><Pencil size={13} /></button>
+        }
+        <button className="icon-btn danger" onClick={() => onDelete(conv.id)}><Trash2 size={13} /></button>
+      </div>
     </div>
   );
 }
 
-export default App;
+function TypingDots() {
+  return (
+    <div className="msg agent-msg">
+      <div className="msg-avatar agent-avatar"><Bot size={16} /></div>
+      <div className="msg-bubble typing-bubble">
+        <span className="dot" /><span className="dot" /><span className="dot" />
+      </div>
+    </div>
+  );
+}
+
+function Message({ msg }) {
+  const isUser = msg.role === 'user';
+  return (
+    <div className={`msg ${isUser ? 'user-msg' : 'agent-msg'}`}>
+      {!isUser && (
+        <div className="msg-avatar agent-avatar"><Bot size={16} /></div>
+      )}
+      <div className={`msg-bubble ${isUser ? 'user-bubble' : 'agent-bubble'}`}>
+        {msg.content}
+      </div>
+      {isUser && (
+        <div className="msg-avatar user-avatar"><User size={16} /></div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main App
+// ─────────────────────────────────────────────────────────────────────────────
+
+export default function App() {
+  const [conversations, setConversations] = useState([]);
+  const [activeId, setActiveId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [docInfo, setDocInfo] = useState(null);
+  const [inputText, setInputText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const fileInputRef = useRef(null);
+  const bottomRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  // ── Boot ───────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    axios.get(`${API}/conversations`)
+      .then(r => setConversations(r.data))
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
+
+  // ── Conversation ops ───────────────────────────────────────────────────────
+  async function newConversation() {
+    const r = await axios.post(`${API}/conversations`, { title: 'New Chat' });
+    setConversations(prev => [r.data, ...prev]);
+    selectConversation(r.data.id, r.data);
+  }
+
+  async function selectConversation(id, convObj = null) {
+    if (id === activeId) return;
+    setActiveId(id);
+    setMessages([]);
+    setDocInfo(null);
+
+    const r = await axios.get(`${API}/conversations/${id}`);
+    setMessages(r.data.messages);
+    setDocInfo(r.data.conversation.doc_info || null);
+
+    // Refresh list to get updated timestamps/titles
+    const list = await axios.get(`${API}/conversations`);
+    setConversations(list.data);
+  }
+
+  async function deleteConversation(id) {
+    await axios.delete(`${API}/conversations/${id}`);
+    setConversations(prev => prev.filter(c => c.id !== id));
+    if (activeId === id) {
+      setActiveId(null);
+      setMessages([]);
+      setDocInfo(null);
+    }
+  }
+
+  async function renameConversation(id, title) {
+    await axios.patch(`${API}/conversations/${id}`, { title });
+    setConversations(prev =>
+      prev.map(c => c.id === id ? { ...c, title } : c)
+    );
+  }
+
+  // ── Upload ─────────────────────────────────────────────────────────────────
+  async function handleUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file || !activeId) return;
+    setIsUploading(true);
+    const form = new FormData();
+    form.append('file', file);
+    try {
+      const r = await axios.post(`${API}/conversations/${activeId}/upload`, form);
+      setDocInfo(r.data.doc_info);
+      // Refresh conversation list (title may have changed)
+      const list = await axios.get(`${API}/conversations`);
+      setConversations(list.data);
+    } catch (err) {
+      alert('Upload failed: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  }
+
+  // ── Chat ───────────────────────────────────────────────────────────────────
+  async function sendMessage(custom = null) {
+    const text = (custom || inputText).trim();
+    if (!text || !activeId) return;
+
+    const optimistic = { role: 'user', content: text, id: Date.now() };
+    setMessages(prev => [...prev, optimistic]);
+    setInputText('');
+    setIsTyping(true);
+
+    try {
+      const r = await axios.post(`${API}/conversations/${activeId}/chat`, { message: text });
+      setMessages(prev => [...prev, { role: 'agent', content: r.data.response, id: Date.now() + 1 }]);
+      // Refresh list for updated title/timestamp
+      const list = await axios.get(`${API}/conversations`);
+      setConversations(list.data);
+    } catch (err) {
+      setMessages(prev => [...prev, {
+        role: 'agent',
+        content: `⚠️ Error: ${err.response?.data?.detail || err.message}`,
+        id: Date.now() + 1
+      }]);
+    } finally {
+      setIsTyping(false);
+    }
+  }
+
+  function onKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  // Auto-grow textarea
+  function onInput(e) {
+    setInputText(e.target.value);
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px';
+  }
+
+  const activeConv = conversations.find(c => c.id === activeId);
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  return (
+    <div className="shell">
+
+      {/* ── Sidebar ─────────────────────────────────────────────────────── */}
+      <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+        <div className="sidebar-header">
+          <span className="brand-text">InferaDoc</span>
+          <button className="icon-btn" onClick={() => setSidebarOpen(v => !v)} title="Toggle sidebar">
+            <ChevronRight size={18} className={`chevron ${sidebarOpen ? 'rotated' : ''}`} />
+          </button>
+        </div>
+
+        <button className="new-chat-btn" onClick={newConversation}>
+          <Plus size={16} /> New Chat
+        </button>
+
+        <div className="conv-list">
+          {conversations.length === 0 && (
+            <p className="empty-hint">No conversations yet.<br />Click "New Chat" to start.</p>
+          )}
+          {conversations.map(conv => (
+            <ConvItem
+              key={conv.id}
+              conv={conv}
+              active={conv.id === activeId}
+              onSelect={selectConversation}
+              onDelete={deleteConversation}
+              onRename={renameConversation}
+            />
+          ))}
+        </div>
+      </aside>
+
+      {/* ── Main ────────────────────────────────────────────────────────── */}
+      <main className="main">
+
+        {/* Top bar */}
+        <header className="topbar">
+          {!sidebarOpen && (
+            <button className="icon-btn" onClick={() => setSidebarOpen(true)}>
+              <ChevronRight size={18} />
+            </button>
+          )}
+          <span className="topbar-title">
+            {activeConv ? activeConv.title : 'InferaDoc — AI Document Assistant'}
+          </span>
+
+          {activeId && (
+            <div className="topbar-actions">
+              {docInfo ? (
+                <div className="doc-pill" title={docInfo.name}>
+                  <FileText size={13} />
+                  <span>{docInfo.name}</span>
+                  <span className="doc-type">{docInfo.type}</span>
+                </div>
+              ) : null}
+              <button
+                className="upload-btn"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+              >
+                <UploadCloud size={15} />
+                {isUploading ? 'Processing…' : docInfo ? 'Replace Doc' : 'Upload Doc'}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.docx,.txt"
+                style={{ display: 'none' }}
+                onChange={handleUpload}
+              />
+            </div>
+          )}
+        </header>
+
+        {/* Chat area */}
+        <div className="chat-area">
+          {!activeId ? (
+            <div className="splash">
+              <Bot size={56} className="splash-icon" />
+              <h2>Welcome to InferaDoc</h2>
+              <p>Create a new conversation and upload a document to begin.</p>
+              <button className="splash-btn" onClick={newConversation}>
+                <Plus size={16} /> New Chat
+              </button>
+            </div>
+          ) : messages.length === 0 && !isTyping ? (
+            <div className="splash">
+              {docInfo ? (
+                <>
+                  <FileText size={48} className="splash-icon ready" />
+                  <h2>Document Ready</h2>
+                  <p><strong>{docInfo.name}</strong> — {docInfo.chunks} chunks indexed.</p>
+                  <div className="quick-prompts">
+                    {['Give me a full summary', 'What are the key points?', 'What is the main topic?'].map(p => (
+                      <button key={p} className="prompt-chip" onClick={() => sendMessage(p)}>{p}</button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <UploadCloud size={48} className="splash-icon" />
+                  <h2>Upload a Document</h2>
+                  <p>Click "Upload Doc" in the top-right to get started.</p>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="messages">
+              {messages.map((msg, i) => <Message key={msg.id || i} msg={msg} />)}
+              {isTyping && <TypingDots />}
+              <div ref={bottomRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Input */}
+        {activeId && (
+          <div className="input-bar">
+            <div className="input-wrap">
+              <textarea
+                ref={textareaRef}
+                className="chat-input"
+                placeholder={docInfo ? 'Ask anything about the document…' : 'Upload a document first…'}
+                value={inputText}
+                onInput={onInput}
+                onChange={e => setInputText(e.target.value)}
+                onKeyDown={onKeyDown}
+                disabled={isTyping}
+                rows={1}
+              />
+              <button
+                className="send-btn"
+                onClick={() => sendMessage()}
+                disabled={isTyping || !inputText.trim()}
+              >
+                <Send size={18} />
+              </button>
+            </div>
+            <p className="input-hint">Enter to send · Shift+Enter for newline</p>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
