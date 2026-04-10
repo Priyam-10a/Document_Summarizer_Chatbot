@@ -22,7 +22,7 @@ from database import (
     get_messages,
 )
 from vector_store import embed_and_store
-from agent import create_agent, chat as agent_chat
+from agent import create_agent
 
 load_dotenv()
 
@@ -168,9 +168,11 @@ class ChatRequest(BaseModel):
     message: str
 
 
+from fastapi.responses import StreamingResponse
+
 @app.post("/conversations/{conv_id}/chat")
-def api_chat(conv_id: str, request: ChatRequest):
-    """Send a message in a conversation and get an AI response."""
+async def api_chat(conv_id: str, request: ChatRequest):
+    """Send a message in a conversation and stream the AI response."""
     if not get_conversation(conv_id):
         raise HTTPException(404, "Conversation not found")
 
@@ -178,20 +180,28 @@ def api_chat(conv_id: str, request: ChatRequest):
         # Persist user message
         add_message(conv_id, "user", request.message)
 
-        # Get AI response
         agent = _get_or_create_agent(conv_id)
-        response_text = agent_chat(agent, conv_id, request.message)
+        
+        async def event_generator():
+            from agent import chat_stream
+            import json
+            full_text = ""
+            async for chunk in chat_stream(agent, conv_id, request.message):
+                full_text += chunk
+                # Safely escape newlines using JSON serialization for SSE
+                yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+            
+            # Auto-title from first user message if still "New Chat"
+            conv = get_conversation(conv_id)
+            if conv["title"] == "New Chat":
+                short_title = request.message[:50].strip()
+                update_conversation(conv_id, title=short_title)
 
-        # Auto-title from first user message if still "New Chat"
-        conv = get_conversation(conv_id)
-        if conv["title"] == "New Chat":
-            short_title = request.message[:50].strip()
-            update_conversation(conv_id, title=short_title)
+            # Persist agent message
+            add_message(conv_id, "agent", full_text)
+            yield f"data: {json.dumps({'chunk': '[DONE]'})}\n\n"
 
-        # Persist agent message
-        add_message(conv_id, "agent", response_text)
-
-        return {"response": response_text}
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
 
     except Exception as e:
         raise HTTPException(500, str(e))

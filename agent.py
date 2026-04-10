@@ -3,7 +3,7 @@
 
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
 from langchain_core.messages import HumanMessage
 from langgraph.prebuilt import create_react_agent
@@ -11,16 +11,13 @@ from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
 # ── LLM Setup ────────────────────────────────────────────────────────────────
-print("🔄 Loading Gemini...")
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
-    google_api_key=GOOGLE_API_KEY,
+print("🔄 Loading Ollama...")
+llm = ChatOllama(
+    model="gemma4:31b-cloud",
     temperature=0.3,
 )
-print("✅ Gemini ready!")
+print("✅ Ollama ready!")
 
 memory = MemorySaver()
 
@@ -80,17 +77,29 @@ def make_tools(conv_id: str):
 def create_agent(conv_id: str):
     """Build a fresh ReAct agent scoped to a conversation."""
     tools = make_tools(conv_id)
-    agent = create_react_agent(model=llm, tools=tools, checkpointer=memory)
+    system_prompt = (
+        "You are InferaDoc, an advanced Document Analysis AI. The user has already uploaded "
+        "their document. You cannot see it directly. YOU MUST ALWAYS proactively use your "
+        "tools (document_search, topic_summarizer, full_document_summary) to retrieve "
+        "information and answer the user. Never ask the user to upload the document."
+    )
+    agent = create_react_agent(model=llm, tools=tools, prompt=system_prompt, checkpointer=memory)
     return agent
 
 
 # ── Chat Helper ───────────────────────────────────────────────────────────────
 
-def chat(agent, conv_id: str, user_message: str) -> str:
-    """Invoke the agent and return its final text response."""
+async def chat_stream(agent, conv_id: str, user_message: str):
+    """Invoke the agent and yield string chunks asynchronously for streaming."""
     config = {"configurable": {"thread_id": conv_id}}
-    result = agent.invoke(
+    
+    async for event in agent.astream_events(
         {"messages": [HumanMessage(content=user_message)]},
         config=config,
-    )
-    return result["messages"][-1].content
+        version="v2"
+    ):
+        if event["event"] == "on_chat_model_stream":
+            chunk = event["data"]["chunk"]
+            # Only stream text content meant for the final user, ignoring hidden tool interactions
+            if chunk.content and not chunk.tool_calls:
+                yield chunk.content
