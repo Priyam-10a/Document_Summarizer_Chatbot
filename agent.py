@@ -69,7 +69,17 @@ def make_tools(conv_id: str):
         )
         return llm.invoke(prompt).content
 
-    return [document_search, topic_summarizer, full_document_summary]
+    @tool
+    def web_search(query: str) -> str:
+        """Search the internet for an answer if it cannot be found in the uploaded document. Use this to avoid hallucinating facts."""
+        from duckduckgo_search import DDGS
+        try:
+            results = DDGS().text(query, max_results=3)
+            return "\n\n".join([f"Source: {r['href']}\n{r['body']}" for r in results])
+        except Exception as e:
+            return f"Web search failed: {str(e)}"
+
+    return [document_search, topic_summarizer, full_document_summary, web_search]
 
 
 # ── Agent Factory ─────────────────────────────────────────────────────────────
@@ -81,7 +91,12 @@ def create_agent(conv_id: str):
         "You are InferaDoc, an advanced Document Analysis AI. The user has already uploaded "
         "their document. You cannot see it directly. YOU MUST ALWAYS proactively use your "
         "tools (document_search, topic_summarizer, full_document_summary) to retrieve "
-        "information and answer the user. Never ask the user to upload the document."
+        "information and answer the user. If the document does not contain the answer, you must NOT hallucinate; "
+        "instead, use the web_search tool to find the exact answer on the internet. "
+        "If you use the web_search tool, you MUST begin your final response exactly with: '🌍 **Web Search Result:**\\n\\n'. "
+        "IMPORTANT FORMATTING RULE: You must write ALL formulas and mathematics using STRICT LaTeX syntax! NEVER use plain unicode math symbols (like ∑ or ∞). "
+        "You MUST wrap ALL LaTeX equations inside dollar signs ($) for inline math (e.g. $\\frac{2}{3}$) or double dollar "
+        "signs ($$) for block math (e.g. $$\\frac{x}{y}$$). Never ask the user to upload the document."
     )
     agent = create_react_agent(model=llm, tools=tools, prompt=system_prompt, checkpointer=memory)
     return agent
