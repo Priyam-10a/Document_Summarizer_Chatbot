@@ -421,7 +421,7 @@ export default function App() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf,.docx,.txt"
+                accept=".pdf,.docx,.txt,.mp3,.wav,.m4a,.mpeg,.flac,.ogg,.webm,.mp4,.mpga"
                 style={{ display: 'none' }}
                 onChange={handleUpload}
               />

@@ -30,6 +30,68 @@ def load_txt(file_path):
         return f.read()
 
 
+def load_mp3(file_path):
+    """Transcribe MP3 and generate Minutes of Meeting JSON autonomously via Groq Cloud APIs"""
+    import os
+    from groq import Groq
+    
+    key = os.environ.get("GROQ_API_KEY")
+    if not key:
+        raise ValueError("GROQ_API_KEY is missing. Please add it to your .env file to run GPU-free extraction.")
+        
+    client = Groq(api_key=key)
+    
+    print(f"🎙️ Transcribing audio via Groq Whisper Cloud: {file_path}")
+    with open(file_path, "rb") as audio_file:
+        transcription = client.audio.transcriptions.create(
+            file=(os.path.basename(file_path), audio_file.read()),
+            model="whisper-large-v3",
+            response_format="verbose_json"
+        )
+    
+    transcript_text = transcription.text
+    if not transcript_text.strip():
+         raise ValueError("The audio file returned an empty transcription.")
+    
+    print("🧠 Extracting structured Minutes of Meeting using Groq LLM...")
+    prompt = f"""
+    You are an expert meeting assistant.
+    Analyze the following transcript and generate structured Minutes of Meeting so that our RAG vector embeddings algorithms can parse and query it natively.
+    
+    IMPORTANT RULES:
+    - Be concise and clear
+    - Extract meaningful discussion points
+    - Identify decisions explicitly
+    - Extract action items clearly
+    - If possible, infer responsible persons
+    - Avoid vague statements
+    
+    Return output strictly in JSON format matching this schema:
+    
+    {{
+      "overview": "...",
+      "discussion_points": ["...", "..."],
+      "decisions": ["...", "..."],
+      "action_items": [
+        {{"task": "...", "owner": "...", "deadline": "..."}}
+      ],
+      "insights": ["...", "..."],
+      "summary": "..."
+    }}
+    
+    Transcript:
+    {transcript_text}
+    """
+    
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile", 
+        messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"}
+    )
+    
+    return response.choices[0].message.content
+
+
 def load_document(file_path):
     """Auto-detect file type and load it"""
     extension = os.path.splitext(file_path)[1].lower()
@@ -43,6 +105,9 @@ def load_document(file_path):
     elif extension == ".txt":
         print(f"📃 Loading text file: {file_path}")
         return load_txt(file_path)
+    elif extension in [".mp3", ".wav", ".m4a", ".mpeg", ".flac", ".ogg", ".webm", ".mp4", ".mpga"]:
+        print(f"🎧 Loading audio file: {file_path}")
+        return load_mp3(file_path)
     else:
         raise ValueError(f"Unsupported file type: {extension}")
 

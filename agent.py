@@ -54,7 +54,7 @@ def make_tools(conv_id: str):
         return llm.invoke(prompt).content
 
     @tool
-    def full_document_summary(input: str) -> str:  # noqa: A002
+    def full_document_summary(dummy: str = "") -> str:
         """Generate a comprehensive summary of the entire uploaded document."""
         results = search_similar_chunks(
             conv_id, "main topics key points overview summary", top_k=8
@@ -88,15 +88,16 @@ def create_agent(conv_id: str):
     """Build a fresh ReAct agent scoped to a conversation."""
     tools = make_tools(conv_id)
     system_prompt = (
-        "You are InferaDoc, an advanced Document Analysis AI. The user has already uploaded "
-        "their document. You cannot see it directly. YOU MUST ALWAYS proactively use your "
-        "tools (document_search, topic_summarizer, full_document_summary) to retrieve "
-        "information and answer the user. If the document does not contain the answer, you must NOT hallucinate; "
-        "instead, use the web_search tool to find the exact answer on the internet. "
-        "If you use the web_search tool, you MUST begin your final response exactly with: '🌍 **Web Search Result:**\\n\\n'. "
-        "IMPORTANT FORMATTING RULE: You must write ALL formulas and mathematics using STRICT LaTeX syntax! NEVER use plain unicode math symbols (like ∑ or ∞). "
-        "You MUST wrap ALL LaTeX equations inside dollar signs ($) for inline math (e.g. $\\frac{2}{3}$) or double dollar "
-        "signs ($$) for block math (e.g. $$\\frac{x}{y}$$). Never ask the user to upload the document."
+        "You are InferaDoc, an advanced Document Analysis AI. The user has uploaded a document. "
+        "You have tools (document_search, topic_summarizer, full_document_summary) "
+        "to retrieve information. Use a tool ONCE to gather context, and then IMMEDIATELY output your final answer. "
+        "DO NOT call tools repeatedly. DO NOT enter a loop. "
+        "If the document does not contain the answer, "
+        "use the web_search tool ONLY ONCE to find the exact answer on the internet. "
+        "If you use the web_search tool, you MUST begin your response exactly with: '🌍 **Web Search Result:**\\n\\n'. "
+        "IMPORTANT: Write ALL mathematical formulas using STRICT LaTeX syntax! NEVER use plain unicode math symbols (like ∑ or ∞). "
+        "Wrap ALL LaTeX equations inside dollar signs ($) for inline math (e.g. $\\frac{2}{3}$) or double dollar "
+        "signs ($$) for block math (e.g. $$\\frac{x}{y}$$). Do not ask the user to upload a document."
     )
     agent = create_react_agent(model=llm, tools=tools, prompt=system_prompt, checkpointer=memory)
     return agent
