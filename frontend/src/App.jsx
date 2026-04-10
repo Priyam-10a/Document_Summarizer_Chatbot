@@ -1,10 +1,15 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import {
   Plus, Trash2, Send, UploadCloud, FileText,
-  Bot, User, MessageSquare, ChevronRight, X,
-  Pencil, Check
+  Bot, User, MessageSquare, ChevronRight,
+  Pencil, Check, Loader2
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import './index.css';
 
 const API = 'http://localhost:8000';
@@ -27,7 +32,7 @@ function timeAgo(iso) {
 // Sub-components
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ConvItem({ conv, active, onSelect, onDelete, onRename }) {
+function ConvItem({ conv, active, onSelect, onDelete, onRename, isActionLoading }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(conv.title);
   const inputRef = useRef(null);
@@ -42,9 +47,13 @@ function ConvItem({ conv, active, onSelect, onDelete, onRename }) {
   return (
     <div
       className={`conv-item ${active ? 'conv-active' : ''}`}
-      onClick={() => !editing && onSelect(conv.id)}
+      onClick={() => !editing && !isActionLoading && onSelect(conv.id)}
     >
-      <MessageSquare size={15} className="conv-icon" />
+      {isActionLoading ? (
+        <Loader2 size={15} className="conv-icon spin-icon" />
+      ) : (
+        <MessageSquare size={15} className="conv-icon" />
+      )}
 
       <div className="conv-body">
         {editing ? (
@@ -56,6 +65,7 @@ function ConvItem({ conv, active, onSelect, onDelete, onRename }) {
             onBlur={commitRename}
             onKeyDown={e => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') setEditing(false); }}
             onClick={e => e.stopPropagation()}
+            disabled={isActionLoading}
           />
         ) : (
           <>
@@ -67,10 +77,12 @@ function ConvItem({ conv, active, onSelect, onDelete, onRename }) {
 
       <div className="conv-actions" onClick={e => e.stopPropagation()}>
         {editing
-          ? <button className="icon-btn" onClick={commitRename}><Check size={13} /></button>
-          : <button className="icon-btn" onClick={() => setEditing(true)}><Pencil size={13} /></button>
+          ? <button className="icon-btn" onClick={commitRename} disabled={isActionLoading}><Check size={13} /></button>
+          : <button className="icon-btn" onClick={() => setEditing(true)} disabled={isActionLoading}><Pencil size={13} /></button>
         }
-        <button className="icon-btn danger" onClick={() => onDelete(conv.id)}><Trash2 size={13} /></button>
+        <button className="icon-btn danger" onClick={() => onDelete(conv.id)} disabled={isActionLoading}>
+          <Trash2 size={13} />
+        </button>
       </div>
     </div>
   );
@@ -95,7 +107,12 @@ function Message({ msg }) {
         <div className="msg-avatar agent-avatar"><Bot size={16} /></div>
       )}
       <div className={`msg-bubble ${isUser ? 'user-bubble' : 'agent-bubble'}`}>
-        {msg.content}
+        <ReactMarkdown 
+          remarkPlugins={[remarkGfm, remarkMath]} 
+          rehypePlugins={[rehypeKatex]}
+        >
+          {msg.content}
+        </ReactMarkdown>
       </div>
       {isUser && (
         <div className="msg-avatar user-avatar"><User size={16} /></div>
@@ -114,62 +131,117 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [docInfo, setDocInfo] = useState(null);
   const [inputText, setInputText] = useState('');
+  
+  // Loading states
   const [isTyping, setIsTyping] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isAppLoading, setIsAppLoading] = useState(true);
+  const [isSwitchingChat, setIsSwitchingChat] = useState(false);
+  const [loadingActions, setLoadingActions] = useState(new Set()); // set of conv_ids currently deleting/renaming
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const fileInputRef = useRef(null);
   const bottomRef = useRef(null);
   const textareaRef = useRef(null);
 
+  const setActionLoading = (id, isLoading) => {
+    setLoadingActions(prev => {
+      const next = new Set(prev);
+      if (isLoading) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  };
+
   // ── Boot ───────────────────────────────────────────────────────────────────
   useEffect(() => {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
     axios.get(`${API}/conversations`)
       .then(r => setConversations(r.data))
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setIsAppLoading(false));
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (bottomRef.current) {
+      const chatArea = bottomRef.current.closest('.chat-area');
+      if (chatArea) {
+        chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
+      } else {
+        bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
   }, [messages, isTyping]);
 
   // ── Conversation ops ───────────────────────────────────────────────────────
   async function newConversation() {
-    const r = await axios.post(`${API}/conversations`, { title: 'New Chat' });
-    setConversations(prev => [r.data, ...prev]);
-    selectConversation(r.data.id, r.data);
+    setIsSwitchingChat(true);
+    try {
+      const r = await axios.post(`${API}/conversations`, { title: 'New Chat' });
+      setConversations(prev => [r.data, ...prev]);
+      setActiveId(r.data.id);
+      setMessages([]);
+      setDocInfo(null);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSwitchingChat(false);
+    }
   }
 
-  async function selectConversation(id, convObj = null) {
-    if (id === activeId) return;
+  async function selectConversation(id) {
+    if (id === activeId || isSwitchingChat) return;
+    setIsSwitchingChat(true);
     setActiveId(id);
     setMessages([]);
     setDocInfo(null);
 
-    const r = await axios.get(`${API}/conversations/${id}`);
-    setMessages(r.data.messages);
-    setDocInfo(r.data.conversation.doc_info || null);
+    try {
+      const r = await axios.get(`${API}/conversations/${id}`);
+      setMessages(r.data.messages || []);
+      setDocInfo(r.data.conversation.doc_info || null);
 
-    // Refresh list to get updated timestamps/titles
-    const list = await axios.get(`${API}/conversations`);
-    setConversations(list.data);
+      // Refresh list to get updated timestamps/titles if backend mutated them
+      const list = await axios.get(`${API}/conversations`);
+      setConversations(list.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSwitchingChat(false);
+    }
   }
 
   async function deleteConversation(id) {
-    await axios.delete(`${API}/conversations/${id}`);
-    setConversations(prev => prev.filter(c => c.id !== id));
-    if (activeId === id) {
-      setActiveId(null);
-      setMessages([]);
-      setDocInfo(null);
+    setActionLoading(id, true);
+    try {
+      await axios.delete(`${API}/conversations/${id}`);
+      setConversations(prev => prev.filter(c => c.id !== id));
+      if (activeId === id) {
+        setActiveId(null);
+        setMessages([]);
+        setDocInfo(null);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActionLoading(id, false);
     }
   }
 
   async function renameConversation(id, title) {
-    await axios.patch(`${API}/conversations/${id}`, { title });
-    setConversations(prev =>
-      prev.map(c => c.id === id ? { ...c, title } : c)
-    );
+    setActionLoading(id, true);
+    try {
+      await axios.patch(`${API}/conversations/${id}`, { title });
+      setConversations(prev =>
+        prev.map(c => c.id === id ? { ...c, title } : c)
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActionLoading(id, false);
+    }
   }
 
   // ── Upload ─────────────────────────────────────────────────────────────────
@@ -199,22 +271,60 @@ export default function App() {
     if (!text || !activeId) return;
 
     const optimistic = { role: 'user', content: text, id: Date.now() };
+    const agentMsgId = Date.now() + 1;
+    
     setMessages(prev => [...prev, optimistic]);
     setInputText('');
     setIsTyping(true);
 
     try {
-      const r = await axios.post(`${API}/conversations/${activeId}/chat`, { message: text });
-      setMessages(prev => [...prev, { role: 'agent', content: r.data.response, id: Date.now() + 1 }]);
-      // Refresh list for updated title/timestamp
-      const list = await axios.get(`${API}/conversations`);
-      setConversations(list.data);
+      const response = await fetch(`${API}/conversations/${activeId}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      
+      let done = false;
+      let buffer = '';
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split('\n\n');
+          buffer = parts.pop(); // keep the last incomplete chunk in the buffer
+          
+          for (const part of parts) {
+            if (part.startsWith('data: ')) {
+              const dataStr = part.slice(6);
+              const data = JSON.parse(dataStr);
+              if (data.chunk === '[DONE]') {
+                 const list = await axios.get(`${API}/conversations`);
+                 setConversations(list.data);
+                 break;
+              }
+              
+              setIsTyping(false); // Stop typing spinner once stream arrives
+              setMessages(prev => {
+                if (!prev.some(m => m.id === agentMsgId)) {
+                  return [...prev, { role: 'agent', content: data.chunk, id: agentMsgId }];
+                }
+                return prev.map(m => m.id === agentMsgId ? { ...m, content: m.content + data.chunk } : m);
+              });
+            }
+          }
+        }
+      }
     } catch (err) {
-      setMessages(prev => [...prev, {
-        role: 'agent',
-        content: `⚠️ Error: ${err.response?.data?.detail || err.message}`,
-        id: Date.now() + 1
-      }]);
+      setMessages(prev => {
+        if (!prev.some(m => m.id === agentMsgId)) {
+          return [...prev, { role: 'agent', content: `⚠️ Error: ${err.message}`, id: agentMsgId }];
+        }
+        return prev.map(m => m.id === agentMsgId ? { ...m, content: m.content + `\n\n⚠️ Error: ${err.message}` } : m);
+      });
     } finally {
       setIsTyping(false);
     }
@@ -243,30 +353,37 @@ export default function App() {
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
         <div className="sidebar-header">
-          <span className="brand-text">InferaDoc</span>
+          <span className="brand-text">INFERADOC</span>
           <button className="icon-btn" onClick={() => setSidebarOpen(v => !v)} title="Toggle sidebar">
             <ChevronRight size={18} className={`chevron ${sidebarOpen ? 'rotated' : ''}`} />
           </button>
         </div>
 
-        <button className="new-chat-btn" onClick={newConversation}>
-          <Plus size={16} /> New Chat
+        <button className="new-chat-btn" onClick={newConversation} disabled={isAppLoading || isSwitchingChat}>
+          {isSwitchingChat && !activeId ? <Loader2 size={16} className="spin-icon"/> : <Plus size={16} />} 
+          New Chat
         </button>
 
         <div className="conv-list">
-          {conversations.length === 0 && (
+          {isAppLoading ? (
+             <div className="loader-box">
+                <Loader2 size={24} className="spin-icon" />
+             </div>
+          ) : conversations.length === 0 ? (
             <p className="empty-hint">No conversations yet.<br />Click "New Chat" to start.</p>
+          ) : (
+            conversations.map(conv => (
+              <ConvItem
+                key={conv.id}
+                conv={conv}
+                active={conv.id === activeId}
+                isActionLoading={loadingActions.has(conv.id)}
+                onSelect={selectConversation}
+                onDelete={deleteConversation}
+                onRename={renameConversation}
+              />
+            ))
           )}
-          {conversations.map(conv => (
-            <ConvItem
-              key={conv.id}
-              conv={conv}
-              active={conv.id === activeId}
-              onSelect={selectConversation}
-              onDelete={deleteConversation}
-              onRename={renameConversation}
-            />
-          ))}
         </div>
       </aside>
 
@@ -296,9 +413,9 @@ export default function App() {
               <button
                 className="upload-btn"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
+                disabled={isUploading || isSwitchingChat}
               >
-                <UploadCloud size={15} />
+                {isUploading ? <Loader2 size={15} className="spin-icon"/> : <UploadCloud size={15} />}
                 {isUploading ? 'Processing…' : docInfo ? 'Replace Doc' : 'Upload Doc'}
               </button>
               <input
@@ -314,33 +431,44 @@ export default function App() {
 
         {/* Chat area */}
         <div className="chat-area">
-          {!activeId ? (
+          {isSwitchingChat ? (
+            <div className="splash loader-splash">
+               <Loader2 size={48} className="spin-icon splash-icon" />
+               <h2>Loading Chat...</h2>
+            </div>
+          ) : !activeId ? (
             <div className="splash">
-              <Bot size={56} className="splash-icon" />
+              <div className="logo-glow">
+                <Bot size={56} className="splash-icon" />
+              </div>
               <h2>Welcome to InferaDoc</h2>
-              <p>Create a new conversation and upload a document to begin.</p>
+              <p>Experience document intelligence with stunning speed and precision.</p>
               <button className="splash-btn" onClick={newConversation}>
-                <Plus size={16} /> New Chat
+                <Plus size={16} /> Start Exploring
               </button>
             </div>
           ) : messages.length === 0 && !isTyping ? (
             <div className="splash">
               {docInfo ? (
                 <>
-                  <FileText size={48} className="splash-icon ready" />
-                  <h2>Document Ready</h2>
-                  <p><strong>{docInfo.name}</strong> — {docInfo.chunks} chunks indexed.</p>
+                  <div className="logo-glow success">
+                    <FileText size={48} className="splash-icon ready" />
+                  </div>
+                  <h2>Document Active</h2>
+                  <p><strong>{docInfo.name}</strong> — {docInfo.chunks} chunks mapped in hyperspace.</p>
                   <div className="quick-prompts">
-                    {['Give me a full summary', 'What are the key points?', 'What is the main topic?'].map(p => (
+                    {['Give me a full summary', 'Extract the key points', 'Identify the main arguments'].map(p => (
                       <button key={p} className="prompt-chip" onClick={() => sendMessage(p)}>{p}</button>
                     ))}
                   </div>
                 </>
               ) : (
                 <>
-                  <UploadCloud size={48} className="splash-icon" />
-                  <h2>Upload a Document</h2>
-                  <p>Click "Upload Doc" in the top-right to get started.</p>
+                  <div className="logo-glow">
+                    <UploadCloud size={48} className="splash-icon" />
+                  </div>
+                  <h2>Upload Payload</h2>
+                  <p>Drop a document or click the top-right button to initiate analysis.</p>
                 </>
               )}
             </div>
@@ -360,23 +488,23 @@ export default function App() {
               <textarea
                 ref={textareaRef}
                 className="chat-input"
-                placeholder={docInfo ? 'Ask anything about the document…' : 'Upload a document first…'}
+                placeholder={docInfo ? 'Query the document...' : 'Awaiting document upload before querying...'}
                 value={inputText}
                 onInput={onInput}
                 onChange={e => setInputText(e.target.value)}
                 onKeyDown={onKeyDown}
-                disabled={isTyping}
+                disabled={isTyping || isSwitchingChat}
                 rows={1}
               />
               <button
                 className="send-btn"
                 onClick={() => sendMessage()}
-                disabled={isTyping || !inputText.trim()}
+                disabled={isTyping || !inputText.trim() || isSwitchingChat}
               >
-                <Send size={18} />
+                {isTyping ? <Loader2 size={18} className="spin-icon" /> : <Send size={18} />}
               </button>
             </div>
-            <p className="input-hint">Enter to send · Shift+Enter for newline</p>
+            <p className="input-hint">Enter to dispatch · Shift+Enter for newline</p>
           </div>
         )}
       </main>
