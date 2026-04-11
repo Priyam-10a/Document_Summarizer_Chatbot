@@ -13,75 +13,69 @@ InferaDoc is an advanced agentic document analysis platform. Upload your documen
 
 ---
 
-## 🧠 Key Features
+## ✨ Features
 
-* 📄 Upload and process documents (PDF / TXT)
-* 🔍 Semantic search using vector embeddings
-* 🤖 Context-aware Q&A over documents
-* 🧾 Automatic summarization of long texts
-* 🧠 Agentic workflow (multi-step reasoning + tool use)
-* ⚡ Fast vector retrieval using ChromaDB
-* 🔒 Fully local inference using Ollama (no API dependency)
+- 📄 **Universal Document Support**: Effortlessly parses and processes PDFs, Word Documents (`.docx`), and standard Text files (`.txt`).
+- 🤖 **Agentic AI Architecture**: Powered by a ReAct (Reason+Act) architecture using LangGraph, allowing the model to decide whether to search the document, summarize a topic, or search the live web.
+- 💬 **Live Conversational Streaming**: Features a robust FastAPI backend streaming responses to a dynamic React frontend in real-time.
+- ⚡ **Lightning Fast Vector Storage**: Utilizes PostgreSQL configured with `pgvector` for hyper-efficient local and cloud-ready ANN embedding search.
+- 🌍 **Web Search Fallback**: Seamlessly bridges facts—if the answer isn't in your document, the agent integrates DuckDuckGo search to prevent hallucinations.
+- 🧮 **Native Math/LaTeX Rendering**: Built-in support to parse, render, and display complex equations using KaTeX and Markdown.
 
----
+## 🛠️ Technology Stack
 
-## 🏗️ Architecture
+InferaDoc is split into a high-performance Python server and a modern React client.
 
-User Query
-↓
-Embedding Model
-↓
-Vector Database (ChromaDB)
-↓
-Relevant Context Retrieval
-↓
-LLM via Ollama (Agentic Reasoning)
-↓
-Final Answer / Summary
+### Backend (`/` & `/server.py`)
+* **Core Framework:** [FastAPI](https://fastapi.tiangolo.com/) (ASGI, fast, type-safe)
+* **Agent logic:** [LangChain](https://www.langchain.com/) & [LangGraph](https://www.langchain.com/langgraph) (ReAct execution, memory checkpointing)
+* **LLM Engine:** Llama / Gemma powered via API integrations (e.g., Groq / Ollama)
+* **Database & Vector Store:** [PostgreSQL](https://www.postgresql.org/) natively augmented with `pgvector`
+* **File Processing:** `PyPDF`, `python-docx`
+* **Embeddings:** Fast local embeddings via `SentenceTransformers`
 
----
+### Frontend (`/frontend`)
+* **Framework:** React 19 (via [Vite](https://vitejs.dev/))
+* **UI & Styling:** Modern custom CSS, Lucide React icons
+* **Markdown Parsing:** `react-markdown` augmented with `remark-math` and `rehype-katex` for crisp rendering.
+* **Networking:** Axios for REST API and SSE (Server-Sent Events) for real-time streaming.
 
-## 🛠️ Tech Stack
+## 🚀 Getting Started
 
-* **Language:** Python
-* **LLM Runtime:** Ollama
-* **Vector DB:** ChromaDB
-* **Frameworks/Libraries:** LangChain / LlamaIndex (if used)
-* **Embeddings:** Sentence Transformers / Ollama embeddings
-* **Frontend (optional):** Streamlit / CLI
+### 1. Prerequisites
+- Python 3.10+
+- Node.js 18+
+- PostgreSQL instance running with the `pgvector` extension enabled.
 
----
-
-## ⚙️ Installation & Setup
-
-### 1. Clone the repository
+### 2. Backend Setup
+Clone the repository and install the Python dependencies:
 
 ```bash
-git clone https://github.com/your-username/repo-name.git
-cd repo-name
-```
+# Clone the repository
+git clone https://github.com/yourusername/InferaDoc.git
+cd InferaDoc
 
-### 2. Install dependencies
+# (Optional) Create a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 
-```bash
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 3. Install and run Ollama
-
-Download from: https://ollama.com
-
-Run a model:
-
-```bash
-ollama run llama3
+Ensure your `.env` file exposes the `DATABASE_URL` pointing to your PostgreSQL+pgvector instance:
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/inferadoc
 ```
 
----
+Launch the FastAPI backend server:
+```bash
+python server.py
+# The API will be available at http://localhost:8000
+```
 
-## ▶️ Usage
-
-### Run the chatbot:
+### 3. Frontend Setup
+Open a new terminal window in the `frontend` folder:
 
 ```bash
 cd frontend
