@@ -1,166 +1,80 @@
 # vector_store.py
-# Converts chunks into embeddings and stores them in ChromaDB
+# Nomic Atlas embeddings + pgvector (PostgreSQL) storage
 
 import os
-import chromadb
-from sentence_transformers import SentenceTransformer
+import requests
+from dotenv import load_dotenv
 from document_loader import load_and_chunk
+from database import store_chunks, search_chunks
 
-# ── Setup ────────────────────────────────────────────────────
-CHROMA_PATH = "C:\\doc-summarizer-agent\\chroma_db"
-EMBED_MODEL  = "all-MiniLM-L6-v2"
+load_dotenv()
 
-# Load the embedding model once (reused across functions)
-print("🔄 Loading embedding model...")
-embedder = SentenceTransformer(EMBED_MODEL)
-print("✅ Embedding model ready!")
+NOMIC_API_KEY = os.getenv("NOMIC_API_KEY")
+NOMIC_URL     = "https://api-atlas.nomic.ai/v1/embedding/text"
+EMBED_MODEL   = "nomic-embed-text-v1.5"
 
 
-def get_chroma_client():
-    """Get a persistent ChromaDB client"""
-    client = chromadb.PersistentClient(path=CHROMA_PATH)
-    return client
-
-
-def get_or_create_collection(client, collection_name="documents"):
-    """Get existing collection or create a new one"""
-    collection = client.get_or_create_collection(
-        name=collection_name,
-        metadata={"hnsw:space": "cosine"}  # cosine similarity for text
-    )
-    return collection
-
-
-def embed_and_store(file_path, collection_name="documents",
-                    chunk_size=500, overlap=50):
+def _get_embeddings(texts: list[str], task_type: str = "search_document") -> list[list[float]]:
     """
-    Full pipeline:
-    1. Load document
-    2. Split into chunks
-    3. Embed each chunk
-    4. Store in ChromaDB
+    Call Nomic Atlas API to get 768-dimensional text embeddings.
+
+    task_type:
+        "search_document" — for chunks being stored
+        "search_query"    — for the user's query at search time
+    """
+    if not NOMIC_API_KEY:
+        raise ValueError("NOMIC_API_KEY is not set. Add it to your .env file.")
+
+    headers = {
+        "Authorization": f"Bearer {NOMIC_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": EMBED_MODEL,
+        "texts": texts,
+        "task_type": task_type,
+    }
+
+    response = requests.post(NOMIC_URL, headers=headers, json=payload, timeout=60)
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"Nomic API error {response.status_code}: {response.text}"
+        )
+
+    return response.json()["embeddings"]
+
+
+def embed_and_store(conv_id: str, file_path: str,
+                    chunk_size: int = 500, overlap: int = 50):
+    """
+    Full pipeline for one conversation:
+      1. Load & chunk the document
+      2. Embed with Nomic
+      3. Store in PostgreSQL via pgvector
     """
     print(f"\n📥 Processing: {file_path}")
-
-    # Step 1 & 2 — Load and chunk
     chunks = load_and_chunk(file_path, chunk_size, overlap)
 
-    # Step 3 — Embed all chunks at once (faster than one by one)
-    print("🔄 Generating embeddings...")
-    embeddings = embedder.encode(chunks, show_progress_bar=True)
-    print(f"✅ Generated {len(embeddings)} embeddings")
+    print(f"🔄 Embedding {len(chunks)} chunks via Nomic Atlas...")
+    # Nomic API supports batching; send in groups of 100 to stay within limits
+    all_embeddings = []
+    batch_size = 100
+    for i in range(0, len(chunks), batch_size):
+        batch = chunks[i:i + batch_size]
+        batch_embeddings = _get_embeddings(batch, task_type="search_document")
+        all_embeddings.extend(batch_embeddings)
+        print(f"  ✓ Embedded chunks {i + 1}–{i + len(batch)}")
 
-    # Step 4 — Store in ChromaDB
-    print("💾 Storing in ChromaDB...")
-    client     = get_chroma_client()
-    collection = get_or_create_collection(client, collection_name)
-
-    # Give each chunk a unique ID
-    file_name = os.path.basename(file_path)
-    ids = [f"{file_name}_chunk_{i}" for i in range(len(chunks))]
-
-    # Store chunks + embeddings + metadata
-    collection.add(
-        ids        = ids,
-        documents  = chunks,
-        embeddings = embeddings.tolist(),
-        metadatas  = [{"source": file_name, "chunk_index": i}
-                      for i in range(len(chunks))]
-    )
-
-    print(f"✅ Stored {len(chunks)} chunks from '{file_name}' in ChromaDB!")
-    return collection
+    source = os.path.basename(file_path)
+    store_chunks(conv_id, chunks, all_embeddings, source)
+    print(f"✅ Done — {len(chunks)} chunks stored for conversation {conv_id}")
+    return len(chunks)
 
 
-def search_similar_chunks(query, collection_name="documents", top_k=3):
+def search_similar_chunks(conv_id: str, query: str, top_k: int = 4) -> list[dict]:
     """
-    Search ChromaDB for the most relevant chunks
-    given a user's query
+    Embed the query (as search_query) and find the closest chunks
+    in the given conversation's vector store.
     """
-    # Embed the query using the same model
-    query_embedding = embedder.encode([query]).tolist()
-
-    client     = get_chroma_client()
-    collection = get_or_create_collection(client, collection_name)
-
-    # Find top_k most similar chunks
-    results = collection.query(
-        query_embeddings = query_embedding,
-        n_results        = top_k,
-        include          = ["documents", "distances", "metadatas"]
-    )
-
-    # Format results nicely
-    chunks    = results["documents"][0]
-    distances = results["distances"][0]
-    metadatas = results["metadatas"][0]
-
-    formatted = []
-    for i, (chunk, dist, meta) in enumerate(
-            zip(chunks, distances, metadatas)):
-        formatted.append({
-            "rank"     : i + 1,
-            "chunk"    : chunk,
-            "score"    : round(1 - dist, 3),  # convert distance to similarity
-            "source"   : meta["source"],
-            "chunk_idx": meta["chunk_index"]
-        })
-
-    return formatted
-
-
-def clear_collection(collection_name="documents"):
-    """Delete all stored chunks (fresh start)"""
-    try:
-        client = get_chroma_client()
-        client.delete_collection(collection_name)
-        print(f"🗑️  Cleared collection: {collection_name}")
-    except Exception:
-        print(f"ℹ️  No existing collection found — starting fresh!")
-
-
-# ── Quick test ───────────────────────────────────────────────
-if __name__ == "__main__":
-    print("=" * 50)
-    print("Testing Vector Store with dummy document...")
-    print("=" * 50)
-
-    # Create a dummy test file
-    dummy_content = """Artificial intelligence is transforming industries worldwide.
-Machine learning allows computers to learn from data without being explicitly programmed.
-Deep learning uses multi-layered neural networks to process complex patterns.
-Natural language processing enables computers to understand and generate human language.
-RAG stands for Retrieval Augmented Generation.
-It combines a retrieval system with a language model to generate accurate answers.
-Vector databases store high-dimensional embeddings for fast similarity search.
-ChromaDB is an open-source vector database that runs locally.
-LangChain is a framework for building applications powered by language models.
-Ollama allows you to run large language models locally on your own hardware.
-Sentence transformers convert text into dense vector representations.
-These vectors capture the semantic meaning of the text.""" * 5
-
-    # Save dummy file
-    with open("test_document.txt", "w") as f:
-        f.write(dummy_content)
-    print("📄 Created test_document.txt")
-
-    # Clear any old data
-    clear_collection()
-
-    # Embed and store
-    embed_and_store("test_document.txt", chunk_size=60, overlap=10)
-
-    # Test search
-    print("\n🔍 Testing search...")
-    query   = "What is RAG and how does it work?"
-    results = search_similar_chunks(query, top_k=3)
-
-    print(f"\nQuery: '{query}'")
-    print(f"Top {len(results)} results:\n")
-    for r in results:
-        print(f"Rank {r['rank']} | Score: {r['score']} | "
-              f"Source: {r['source']}")
-        print(f"  → {r['chunk'][:100]}...")
-        print()
-
-    print("🎉 Vector store is working!")
+    query_embedding = _get_embeddings([query], task_type="search_query")[0]
+    return search_chunks(conv_id, query_embedding, top_k=top_k)
