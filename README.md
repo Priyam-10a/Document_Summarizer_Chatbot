@@ -12,13 +12,13 @@ The system runs **locally using Ollama**, making it **cost-efficient, private, a
 
 ## 🧠 Key Features
 
-* 📄 Upload and process documents (PDF / TXT)
-* 🔍 Semantic search using vector embeddings
-* 🤖 Context-aware Q&A over documents
-* 🧾 Automatic summarization of long texts
-* 🧠 Agentic workflow (multi-step reasoning + tool use)
-* ⚡ Fast vector retrieval using ChromaDB
-* 🔒 Fully local inference using Ollama (no API dependency)
+- 📄 Upload and process documents (PDF / TXT)
+- 🔍 Semantic search using vector embeddings
+- 🤖 Context-aware Q&A over documents
+- 🧾 Automatic summarization of long texts
+- 🧠 Agentic workflow (multi-step reasoning + tool use)
+- ⚡ Fast vector retrieval using ChromaDB
+- 🔒 Fully local inference using Ollama (no API dependency)
 
 ---
 
@@ -40,39 +40,12 @@ Final Answer / Summary
 
 ## 🛠️ Tech Stack
 
-* **Language:** Python
-* **LLM Runtime:** Ollama
-* **Vector DB:** ChromaDB
-* **Frameworks/Libraries:** LangChain / LlamaIndex (if used)
-* **Embeddings:** Sentence Transformers / Ollama embeddings
-* **Frontend (optional):** Streamlit / CLI
-
----
-
-## ⚙️ Installation & Setup
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/your-username/repo-name.git
-cd repo-name
-```
-
-### 2. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Install and run Ollama
-
-Download from: https://ollama.com
-
-Run a model:
-
-```bash
-ollama run llama3
-```
+- **Language:** Python
+- **LLM Runtime:** Ollama
+- **Vector DB:** ChromaDB
+- **Frameworks/Libraries:** LangChain / LlamaIndex (if used)
+- **Embeddings:** Sentence Transformers / Ollama embeddings
+- **Frontend (optional):** Streamlit / CLI
 
 ---
 
@@ -112,20 +85,20 @@ project-root/
 
 ## 🧪 Example Queries
 
-* "Summarize this document in 5 points"
-* "What are the key conclusions?"
-* "Explain section 3 in simple terms"
-* "Give a detailed summary of the methodology"
+- "Summarize this document in 5 points"
+- "What are the key conclusions?"
+- "Explain section 3 in simple terms"
+- "Give a detailed summary of the methodology"
 
 ---
 
 ## 🚧 Future Improvements
 
-* Add multi-document comparison
-* Improve agent reasoning with tool chaining
-* Add UI (Streamlit / Web app)
-* Support more file formats (DOCX, HTML)
-* Add memory for conversation context
+- Add multi-document comparison
+- Improve agent reasoning with tool chaining
+- Add UI (Streamlit / Web app)
+- Support more file formats (DOCX, HTML)
+- Add memory for conversation context
 
 ---
 

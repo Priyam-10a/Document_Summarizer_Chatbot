@@ -1,3 +1,5 @@
+# test_setup.py — run this to confirm all installs are working
+
 print("Testing imports...")
 
 from langchain_ollama import OllamaLLM
@@ -10,14 +12,16 @@ import streamlit
 
 print("✅ All imports successful!")
 
-print("\nTesting Llama 3 connection...")
+# Test Ollama connection
+print("\nTesting Ollama + Llama 3 connection...")
 llm = OllamaLLM(model="llama3")
 response = llm.invoke("Reply with exactly: Setup complete!")
 print(f"Llama 3 says: {response}")
 
+# Test embedding model
 print("\nTesting embedding model...")
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("all-MiniLM-L6-v2")  # small, fast, free
 test_vec = model.encode("Hello world")
-print(f"✅ Embedding works! Vector size: {len(test_vec)}")
+print(f"✅ Embedding model works! Vector size: {len(test_vec)}")
 
 print("\n🎉 All systems go! Ready to build.")
