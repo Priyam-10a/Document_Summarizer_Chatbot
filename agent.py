@@ -11,7 +11,7 @@ import os
 
 # ── Setup Llama 3 ─────────────────────────────────────────────
 print("🔄 Loading Llama 3...")
-llm = ChatOllama(model="llama3.1", temperature=0.3)  # llama3.1+ supports tools
+llm = ChatOllama(model="llama3.1", temperature=0.3)
 print("✅ Llama 3 ready!")
 
 
