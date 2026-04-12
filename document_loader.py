@@ -52,6 +52,12 @@ def load_mp3(file_path):
     transcript_text = transcription.text
     if not transcript_text.strip():
          raise ValueError("The audio file returned an empty transcription.")
+         
+    # Save transcript to disk right next to the audio file
+    transcript_path = os.path.splitext(file_path)[0] + "_transcript.txt"
+    with open(transcript_path, "w", encoding="utf-8") as f:
+        f.write(transcript_text)
+    
     
     print("🧠 Extracting structured Minutes of Meeting using Groq LLM...")
     prompt = f"""
@@ -84,7 +90,7 @@ def load_mp3(file_path):
     """
     
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile", 
+        model="llama-3.1-8b-instant", 
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"}
     )

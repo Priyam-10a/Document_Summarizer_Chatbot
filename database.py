@@ -25,16 +25,21 @@ def init_db():
     Create all required tables and the pgvector extension.
     Safe to call multiple times (CREATE IF NOT EXISTS).
     """
+    # Init users table first (conversations has FK to users)
+    from auth import init_users_table
+    init_users_table()
+
     conn = get_conn()
     cur = conn.cursor()
     try:
         # Enable pgvector (must be installed in Postgres)
         cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
 
-        # Conversations table
+        # Conversations table — scoped to a user
         cur.execute("""
             CREATE TABLE IF NOT EXISTS conversations (
                 id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
                 title       VARCHAR(255) NOT NULL DEFAULT 'New Chat',
                 doc_info    JSONB,
                 created_at  TIMESTAMPTZ DEFAULT NOW(),
@@ -91,13 +96,13 @@ def init_db():
 
 # ── Conversations ────────────────────────────────────────────────────────────
 
-def create_conversation(title: str = "New Chat") -> dict:
+def create_conversation(user_id: str, title: str = "New Chat") -> dict:
     conn = get_conn()
     cur = conn.cursor()
     try:
         cur.execute(
-            "INSERT INTO conversations (title) VALUES (%s) RETURNING *;",
-            (title,)
+            "INSERT INTO conversations (user_id, title) VALUES (%s, %s) RETURNING *;",
+            (user_id, title)
         )
         row = dict(cur.fetchone())
         conn.commit()
@@ -107,12 +112,13 @@ def create_conversation(title: str = "New Chat") -> dict:
         conn.close()
 
 
-def list_conversations() -> list:
+def list_conversations(user_id: str) -> list:
     conn = get_conn()
     cur = conn.cursor()
     try:
         cur.execute(
-            "SELECT * FROM conversations ORDER BY updated_at DESC;"
+            "SELECT * FROM conversations WHERE user_id = %s ORDER BY updated_at DESC;",
+            (user_id,)
         )
         return [dict(r) for r in cur.fetchall()]
     finally:

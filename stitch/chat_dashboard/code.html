@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Lucid Architect | Editorial Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f2f4f6",
+                    "on-tertiary-fixed": "#351000",
+                    "outline": "#737783",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-secondary": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#264c80",
+                    "primary": "#043568",
+                    "surface-tint": "#3a5f94",
+                    "surface-variant": "#e0e3e5",
+                    "tertiary-fixed-dim": "#ffb694",
+                    "tertiary-container": "#833301",
+                    "secondary-container": "#cbe7f5",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "on-surface": "#191c1e",
+                    "inverse-primary": "#a7c8ff",
+                    "on-secondary-fixed": "#021f29",
+                    "secondary-fixed": "#cbe7f5",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#ffdbcc",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#ffa77e",
+                    "on-primary-fixed-variant": "#1f477b",
+                    "inverse-surface": "#2d3133",
+                    "on-primary-container": "#9abef9",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "surface": "#f7f9fb",
+                    "on-secondary-container": "#4e6874",
+                    "primary-fixed-dim": "#a7c8ff",
+                    "on-primary-fixed": "#001b3c",
+                    "surface-container-high": "#e6e8ea",
+                    "outline-variant": "#c2c6d3",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "primary-fixed": "#d5e3ff",
+                    "secondary": "#48626e",
+                    "surface-bright": "#f7f9fb",
+                    "on-background": "#191c1e",
+                    "error": "#ba1a1a",
+                    "surface-container": "#eceef0",
+                    "on-surface-variant": "#424751",
+                    "tertiary": "#5f2200",
+                    "background": "#f7f9fb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-gradient {
+            background: linear-gradient(135deg, #043568 0%, #264c80 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden">
+<!-- TopNavBar (Shared Component JSON Mapping) -->
+<header class="fixed top-0 left-0 w-full h-16 px-6 z-50 flex justify-between items-center bg-slate-50 dark:bg-slate-900 tonal-shift via bg-slate-100 dark:bg-slate-800">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold tracking-tight text-blue-950 dark:text-blue-50 font-headline">The Lucid Architect</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-full">settings</button>
+<button class="material-symbols-outlined p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-full">account_circle</button>
+</div>
+</header>
+<!-- SideNavBar (Shared Component JSON Mapping) -->
+<nav class="fixed left-0 top-0 h-full w-72 flex flex-col py-8 gap-6 bg-slate-100 dark:bg-slate-950 z-40 pt-24">
+<div class="px-6 mb-4">
+<h2 class="text-lg font-black text-blue-900 dark:text-blue-100 font-headline">The Architect</h2>
+<p class="text-xs text-slate-500 uppercase tracking-widest font-semibold mt-1">Editorial Intelligence</p>
+</div>
+<div class="px-6">
+<button class="w-full editorial-gradient text-on-primary py-3 rounded-md font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">add</span>
+                New Summary
+            </button>
+</div>
+<div class="flex-grow flex flex-col gap-1">
+<!-- Active State: Recent Chats (Contextually determined) -->
+<a class="flex items-center gap-3 text-blue-900 dark:text-blue-200 font-semibold border-l-4 border-blue-900 dark:border-blue-400 pl-4 py-2 hover:text-blue-800 transition-all font-manrope text-sm" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+                Recent Chats
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-2 hover:text-blue-800 hover:translate-x-1 transition-all font-manrope text-sm" href="#">
+<span class="material-symbols-outlined">description</span>
+                Documents
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-2 hover:text-blue-800 hover:translate-x-1 transition-all font-manrope text-sm" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+                Library
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-2 hover:text-blue-800 hover:translate-x-1 transition-all font-manrope text-sm" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+                Insights
+            </a>
+</div>
+<div class="mt-auto flex flex-col gap-1 border-t border-slate-200/50 pt-4">
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-2 hover:text-blue-800 hover:translate-x-1 transition-all font-manrope text-sm" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+                Help
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-2 hover:text-blue-800 hover:translate-x-1 transition-all font-manrope text-sm" href="#">
+<span class="material-symbols-outlined">archive</span>
+                Archive
+            </a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pl-72 pt-16 h-screen flex overflow-hidden">
+<!-- Left Side: Document Preview (Editorial Layout 65%) -->
+<section class="w-[65%] h-full bg-surface-container overflow-y-auto p-12">
+<div class="max-w-3xl mx-auto">
+<div class="bg-surface-container-lowest rounded-xl p-10 shadow-sm min-h-[1000px] relative">
+<!-- Document Header -->
+<div class="mb-12">
+<div class="flex items-center gap-2 mb-4">
+<span class="px-2 py-1 bg-primary-container/10 text-primary text-[10px] font-bold uppercase tracking-widest rounded">Internal Report</span>
+<span class="text-on-surface-variant text-xs font-medium">Modified 2h ago</span>
+</div>
+<h1 class="text-4xl font-headline font-extrabold text-on-surface tracking-tight leading-tight mb-6">Sustainable Urban Framework: 2025 Architecture Analysis</h1>
+<p class="text-on-surface-variant font-medium text-lg leading-relaxed italic border-l-4 border-surface-tint/20 pl-6 mb-10">
+                            An analytical deep-dive into the intersection of modular design and ecological resilience in metropolitan development.
+                        </p>
+</div>
+<!-- Document Content Body -->
+<div class="space-y-12 text-on-surface leading-loose text-lg font-light">
+<section>
+<h3 class="text-xl font-headline font-bold text-on-surface mb-4">1.0 Executive Synthesis</h3>
+<p>
+                                The current paradigm of urban sprawl necessitates a fundamental shift toward vertical modularity. By leveraging prefabricated structural units composed of bio-integrated polymers, developers can reduce carbon footprints by approximately 42% over a ten-year lifecycle. This report outlines the technical specifications and economic viability of such systems within the Pacific Northwest climate zone.
+                            </p>
+</section>
+<div class="my-12 overflow-hidden rounded-xl bg-surface-container-low">
+<img alt="Modern architectural blueprint" class="w-full h-72 object-cover opacity-90" data-alt="Modern architectural glass building facade reflecting blue sky with clean geometric lines and soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBKGyPMnm0HM51VP7IHkxzGcQqs122eoUPcTPhLbaO8T_fsixg4COib9YcMs-Czfhz2GgI5znl3DzXyAUc15aLl9_ZVxH69hsgGcBxpl6eC8iXZiTjVu6R00M89zTLKhr6-a1ogLXK8cnxv-e9AQqEu7S0jwqLebKIx6BTaFRNSOio0fWG3cU2tTgbpeZSV_Xo-DSxKQaZP-W0x7tTIUOwl49PrOILZreA8UP3HCRT8IB7T2CVflqqr1IYQak0Mu-vJ7V53sLcthw"/>
+<div class="p-4 text-xs text-on-surface-variant font-medium text-center italic">
+                                Fig 1.1: Proposed Modular Core for the Seattle Waterfront District
+                            </div>
+</div>
+<section>
+<h3 class="text-xl font-headline font-bold text-on-surface mb-4">2.0 Material Resilience</h3>
+<p>
+                                Unlike traditional concrete and steel frameworks, the bio-polymer matrix exhibits self-healing properties when exposed to high-humidity environments. This allows for structural longevity that surpasses current building codes by an estimated 30 years, significantly lowering long-term maintenance costs.
+                            </p>
+<p class="mt-4">
+                                Testing indicates that thermal retention is improved by 18% during peak winter cycles, reducing reliance on external energy grids. The integration of rooftop greywater collection systems further solidifies the building as an autonomous ecological unit.
+                            </p>
+</section>
+</div>
+<!-- Decorative Element -->
+<div class="absolute bottom-10 left-10 text-[80px] font-black text-surface-container-high/30 select-none">2025</div>
+</div>
+</div>
+</section>
+<!-- Right Side: AI Insights Chat (Editorial Layout 35%) -->
+<section class="w-[35%] h-full bg-surface-container-low border-l border-outline-variant/15 flex flex-col">
+<!-- Chat Header -->
+<div class="p-6 bg-surface-container-lowest/50 backdrop-blur-md flex items-center justify-between border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 editorial-gradient rounded-full flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-sm">auto_awesome</span>
+</div>
+<div>
+<h4 class="text-sm font-headline font-bold">Insight Engine</h4>
+<span class="text-[10px] text-primary font-bold uppercase tracking-tighter">Connected to Document</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+</div>
+<!-- Messages Container -->
+<div class="flex-grow overflow-y-auto p-6 space-y-8 flex flex-col">
+<!-- AI Welcome Message -->
+<div class="max-w-[90%] self-start">
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm relative group">
+<div class="absolute top-0 left-0 w-1 h-8 editorial-gradient rounded-full -ml-0.5"></div>
+<p class="text-sm leading-relaxed text-on-surface">
+                            I've analyzed the <strong>Sustainable Urban Framework</strong>. The document focuses heavily on modularity and bio-polymer resilience. Would you like a technical summary of the material specs or an economic breakdown?
+                        </p>
+<div class="mt-4 flex flex-wrap gap-2">
+<button class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-outline-variant/30 text-on-surface-variant hover:bg-primary hover:text-white hover:border-primary transition-all">Material Specs</button>
+<button class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-outline-variant/30 text-on-surface-variant hover:bg-primary hover:text-white hover:border-primary transition-all">Economic ROI</button>
+</div>
+</div>
+<span class="text-[10px] text-on-surface-variant/60 font-medium ml-2 mt-1">10:42 AM</span>
+</div>
+<!-- User Message -->
+<div class="max-w-[85%] self-end">
+<div class="bg-secondary-container text-on-secondary-container p-4 rounded-xl shadow-sm rounded-tr-sm">
+<p class="text-sm">What does it say about the carbon footprint reduction compared to traditional builds?</p>
+</div>
+<div class="flex justify-end mr-2 mt-1">
+<span class="text-[10px] text-on-surface-variant/60 font-medium">10:44 AM</span>
+</div>
+</div>
+<!-- AI Detailed Response -->
+<div class="max-w-[90%] self-start">
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm relative overflow-hidden">
+<!-- AI Flare -->
+<div class="absolute top-0 left-0 w-24 h-24 bg-surface-tint/5 rounded-full -translate-x-12 -translate-y-12"></div>
+<p class="text-sm leading-relaxed text-on-surface relative z-10">
+                            The report claims a <strong>42% reduction</strong> in the overall carbon footprint over a 10-year lifecycle. This is achieved through:
+                        </p>
+<ul class="mt-3 space-y-2 text-sm text-on-surface-variant relative z-10">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-xs mt-1">check_circle</span>
+                                Lower energy manufacturing of bio-polymers.
+                            </li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-xs mt-1">check_circle</span>
+                                18% improved thermal retention.
+                            </li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-xs mt-1">check_circle</span>
+                                Reduced logistical waste via prefabrication.
+                            </li>
+</ul>
+</div>
+<div class="flex items-center gap-2 ml-2 mt-2">
+<span class="text-[10px] text-on-surface-variant/60 font-medium">10:45 AM</span>
+<button class="material-symbols-outlined text-xs text-on-surface-variant hover:text-primary transition-colors">thumb_up</button>
+<button class="material-symbols-outlined text-xs text-on-surface-variant hover:text-error transition-colors">thumb_down</button>
+</div>
+</div>
+</div>
+<!-- Chat Interaction Area -->
+<div class="p-6 bg-surface-container-highest/30 backdrop-blur-sm space-y-4">
+<!-- Quick Actions & Toggles -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest rounded-full shadow-sm hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+<span class="text-[10px] font-bold uppercase tracking-tight text-on-surface">Summarize</span>
+</button>
+<div class="h-4 w-[1px] bg-outline-variant/30"></div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Web Search</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-8 h-4 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- Input Box -->
+<div class="relative group">
+<textarea class="w-full bg-surface-container-lowest border-0 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all shadow-sm resize-none pr-12 placeholder:text-on-surface-variant/40" placeholder="Ask anything about the document..." rows="2"></textarea>
+<button class="absolute right-3 bottom-3 w-8 h-8 editorial-gradient text-on-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/30 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+<p class="text-[10px] text-center text-on-surface-variant/50">Press Enter to send • / for commands</p>
+</div>
+</section>
+</main>
+<!-- FAB Suppression Applied (Not needed for this focused detail screen) -->
+</body></html>

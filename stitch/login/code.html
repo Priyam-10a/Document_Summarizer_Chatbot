@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | The Lucid Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#cbe7f5",
+                    "surface-dim": "#d8dadc",
+                    "primary-container": "#264c80",
+                    "primary": "#043568",
+                    "tertiary-fixed-dim": "#ffb694",
+                    "outline-variant": "#c2c6d3",
+                    "inverse-primary": "#a7c8ff",
+                    "surface": "#f7f9fb",
+                    "on-secondary-container": "#4e6874",
+                    "on-surface": "#191c1e",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "on-tertiary-fixed": "#351000",
+                    "on-tertiary": "#ffffff",
+                    "secondary": "#48626e",
+                    "inverse-surface": "#2d3133",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "on-primary-container": "#9abef9",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#eceef0",
+                    "secondary-fixed": "#cbe7f5",
+                    "surface-variant": "#e0e3e5",
+                    "on-error": "#ffffff",
+                    "outline": "#737783",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#d5e3ff",
+                    "error-container": "#ffdad6",
+                    "background": "#f7f9fb",
+                    "on-tertiary-container": "#ffa77e",
+                    "surface-container-high": "#e6e8ea",
+                    "tertiary": "#5f2200",
+                    "on-primary-fixed": "#001b3c",
+                    "surface-tint": "#3a5f94",
+                    "surface-bright": "#f7f9fb",
+                    "on-background": "#191c1e",
+                    "tertiary-fixed": "#ffdbcc",
+                    "primary-fixed-dim": "#a7c8ff",
+                    "on-surface-variant": "#424751",
+                    "on-primary-fixed-variant": "#1f477b",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#833301",
+                    "surface-container-low": "#f2f4f6",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-secondary-fixed": "#021f29"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+.bg-pattern {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBDgbyGF0LtFy_EJ42j_OJn4Z8knb3k9YHW6fI7JxWbc3LIhe3a2aR-Vvohs1yUODyyPtIXVr67umocmxMaP6nu2aJhMx982S3KuNhFdii8QiitPk3xjp1f0qmozI5TvH_VkfEZo2rH7-bANHuJ3wLZvDWcYf4EMsvQjPVucQr8VbhFFIG3gRUL9pMZgcdZhSB2Hby94A89PWUebirWZNIX4eMX-Eq0WRkqFhHnVeMg9aoqucLWRSHh2wwVMKFDNgjXy-3H6Jl8DRc);
+    opacity: 0.03
+    }</style>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+<!-- Background Architectural Texture Layer -->
+<div class="absolute inset-0 bg-pattern pointer-events-none"></div>
+<div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary-container/5 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-secondary-container/10 rounded-full blur-[100px]"></div>
+<!-- Login Container -->
+<main class="w-full max-w-[1200px] grid grid-cols-1 lg:grid-cols-2 bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_32px_64px_-12px_rgba(25,28,30,0.04)] relative z-10">
+<!-- Branding & Visual Column -->
+<section class="hidden lg:flex flex-col justify-between p-12 bg-surface-container-low relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-12">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="architecture">architecture</span>
+<h1 class="font-headline text-2xl font-extrabold tracking-tight text-primary">The Lucid Architect</h1>
+</div>
+<div class="space-y-6 max-w-md">
+<h2 class="font-headline text-4xl font-bold leading-tight text-on-surface">The Editorial Intelligence for Professional Insight.</h2>
+<p class="text-on-surface-variant text-lg leading-relaxed">Experience a workspace that treats documentation as a curated service. Sign in to access your editorial dashboard and intelligent summaries.</p>
+</div>
+</div>
+<div class="relative z-10">
+<div class="flex -space-x-3 mb-4">
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-lowest" data-alt="Portrait of a professional male architect in a clean studio setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ-WmuYQtD5kDHxykR4Wn_yQBqJVklCSzAgPmPb7BFLc2oIZAkWQ3MVVB5pd9XSM-IcWaacN8OJCFX2UX92p2cPMVagYY2fvF56rPS2-9oh5GJLGPynlWSpcxnpS2cHH9oeHq1UKeXLSsDM7DKG9H1g2h_vZkAe1-PZ4FK3gjG4m9AsSrzcM2jNmLMQqw07LeR93glYYTaaz8FBb_may8JKFhahXmu9sOxltAcvUy_dI2LYuCUqQRsb07CWqp5iIxMdlam8VUQtIY"/>
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-lowest" data-alt="Close-up of a smiling female creative director in a modern bright office space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEhWDrH4eTReKLnsKix8IYPNEriQAjBXxCuSuCQdMkfMaZLFFylEcdFa9OwnuEzSHEcVXKq5EETDC0pSvJA79TDVcOhALlGd6-1HhvDgMuGTGmKJbAG61480L_hENhnFso55NjwrWki_nsHjWpwJOdqPCPTdeVEQRqiPqB3ZmK9-G45owOrESypHkYthsFBSIM5yO5OJGaGSap3tvLQmjZh29fcJDSGalSGT0kwT4NdSsjM4jaaRKzKfBoHx-sXfnhYsoXRQWA73w"/>
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-lowest" data-alt="Headshot of a senior executive male with a neutral expression in a high-end corporate environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcjBG07i-zxiVIpytFHnaeVTYYTCEVGfrLa7WUsCEoIATeYrtqcdhLV6UY4JVG9MFN2BaIecToXJlY7VDIAxmsFI1G4PVt1nkFYTcbABZW6akwkPR3HrVXvzN64pH_3aDAl17LAKA1K2dxNlGhNfnt7kBxYZQVDte00JCYrVq1J6esA_TvH2zcjO62cB1QJ-GyfrMwFNRjClNq_Y77i8bcWjzpWW6UNOoyUWXGHIVcyE4H_3_p-mT3NZPrWNJ1_IiLEesbtcCt3_Q"/>
+</div>
+<p class="text-sm text-on-surface-variant font-medium">Join 2,000+ architects and intelligence analysts.</p>
+</div>
+<!-- Decorative Abstract Architecture Element -->
+<div class="absolute right-[-20%] bottom-[-10%] w-[80%] h-[80%] opacity-10 rotate-12">
+<img class="w-full h-full object-cover rounded-xl grayscale" data-alt="Minimalist low angle shot of a modern glass skyscraper reflecting the blue sky with sharp geometric lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJWiLFMSrmEjhChBGNwgQxWY8YciPMLv5BjVvr11uSclus2U4GKhzgSsv82geOCdOy4IcG03xQKMYjyr7yhTTKRfDLJEelrvoNp6jDXBx10swQsrQ71MJAo6IKtxcOk5HIgtI9UXZoQ0bcKB7XNYWz4U9anoh3hCVzKTsvcRxco8EVXf5a6h-HEVBPm-0-jwx4afk9TV8w57HyQHo-TvPlNMjOl-bOrgZ4rIYuCtBRdfVSjnH5PypbHe_2M9ZDmhs9iC6FV836wWQ"/>
+</div>
+</section>
+<!-- Form Column -->
+<section class="p-8 md:p-12 lg:p-20 flex flex-col justify-center">
+<div class="max-w-md mx-auto w-full">
+<!-- Mobile Logo -->
+<div class="lg:hidden flex items-center gap-2 mb-10">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="architecture">architecture</span>
+<h1 class="font-headline text-xl font-extrabold tracking-tight text-primary">The Lucid Architect</h1>
+</div>
+<div class="mb-10">
+<h2 class="font-headline text-3xl font-bold text-on-surface mb-2">Welcome Back</h2>
+<p class="text-on-surface-variant">Please enter your credentials to continue your work.</p>
+</div>
+<!-- SSO Section -->
+<div class="grid grid-cols-2 gap-4 mb-8">
+<button class="flex items-center justify-center gap-3 px-4 py-3 bg-surface-container-highest rounded-xl text-on-surface font-medium hover:bg-surface-dim transition-colors duration-200">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrvTUCCAC1jZTC3hNmRAGTlNaKR1rbcsQY-eW1N1chDUPUWyZYaYHNI9M9KqisEAYQmfx_iwpuPQ81im199fjtsvNdadW283npkg93uAFFoe-ENMiwHK3XknW56yfLNNrEkB7QWqnJnq0LlxGXclIHW8ASlmaQMxq7m3ehR83eIaTuh1X5n3W92nvIhuzJCnPmQ5HBuoew6OGzGWNt_hHmFGo5WUUla4aFQWPW3Yix8Of2kg08_-qbtlZa68oIiNc2lWeYYWLDfSg"/>
+<span>Google</span>
+</button>
+<button class="flex items-center justify-center gap-3 px-4 py-3 bg-surface-container-highest rounded-xl text-on-surface font-medium hover:bg-surface-dim transition-colors duration-200">
+<span class="material-symbols-outlined text-xl" data-icon="terminal">terminal</span>
+<span>SSO</span>
+</button>
+</div>
+<div class="relative flex items-center justify-center mb-8">
+<div class="w-full h-px bg-surface-container-high"></div>
+<span class="absolute px-4 bg-surface-container-lowest text-sm text-on-surface-variant">or continue with email</span>
+</div>
+<!-- Login Form -->
+<form action="#" class="space-y-6">
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-2" for="email">Email Address</label>
+<input class="w-full px-4 py-3.5 bg-surface-container-low border-none rounded-xl text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary transition-all duration-200" id="email" name="email" placeholder="name@architect.com" type="email"/>
+</div>
+<div>
+<div class="flex items-center justify-between mb-2">
+<label class="block text-sm font-semibold text-on-surface" for="password">Password</label>
+<a class="text-sm font-semibold text-primary hover:text-primary-container transition-colors" href="#">Forgot Password?</a>
+</div>
+<input class="w-full px-4 py-3.5 bg-surface-container-low border-none rounded-xl text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary transition-all duration-200" id="password" name="password" placeholder="••••••••" type="password"/>
+</div>
+<div class="flex items-center">
+<input class="h-4 w-4 text-primary focus:ring-primary border-outline-variant rounded" id="remember-me" name="remember-me" type="checkbox"/>
+<label class="ml-2 block text-sm text-on-surface-variant" for="remember-me">Stay signed in for 30 days</label>
+</div>
+<button class="w-full py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold rounded-xl shadow-lg shadow-primary/10 hover:scale-[1.01] active:scale-95 transition-all duration-200 flex items-center justify-center gap-2" type="submit">
+<span>Sign In to Dashboard</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<p class="mt-10 text-center text-sm text-on-surface-variant">
+                    Don't have an account? 
+                    <a class="font-bold text-primary hover:text-primary-container transition-colors" href="#">Request Access</a>
+</p>
+</div>
+</section>
+</main>
+<!-- Footer Meta -->
+<footer class="absolute bottom-6 left-0 right-0 text-center z-10">
+<p class="text-xs text-on-surface-variant/60 font-medium">© 2024 The Lucid Architect Intelligence Systems. All rights reserved.</p>
+</footer>
+</body></html>
