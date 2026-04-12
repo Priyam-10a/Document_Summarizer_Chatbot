@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Lucid Architect | Editorial Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary-fixed": "#351000",
+                        "outline": "#737783",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#264c80",
+                        "primary": "#043568",
+                        "surface-tint": "#3a5f94",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#ffb694",
+                        "tertiary-container": "#833301",
+                        "secondary-container": "#cbe7f5",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "inverse-primary": "#a7c8ff",
+                        "on-secondary-fixed": "#021f29",
+                        "secondary-fixed": "#cbe7f5",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffdbcc",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#ffa77e",
+                        "on-primary-fixed-variant": "#1f477b",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-container": "#9abef9",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#304a55",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "surface": "#f7f9fb",
+                        "on-secondary-container": "#4e6874",
+                        "primary-fixed-dim": "#a7c8ff",
+                        "on-primary-fixed": "#001b3c",
+                        "surface-container-high": "#e6e8ea",
+                        "outline-variant": "#c2c6d3",
+                        "secondary-fixed-dim": "#afcbd8",
+                        "primary-fixed": "#d5e3ff",
+                        "secondary": "#48626e",
+                        "surface-bright": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eceef0",
+                        "on-surface-variant": "#424751",
+                        "tertiary": "#5f2200",
+                        "background": "#f7f9fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+        .liquid-gradient {
+            background: linear-gradient(135deg, #043568 0%, #264c80 100%);
+        }
+        .editorial-shadow {
+            box-shadow: 0 8px 32px rgba(25, 28, 30, 0.04);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- TopNavBar -->
+<header class="bg-slate-50 dark:bg-slate-900 flex justify-between items-center w-full px-6 h-16 fixed top-0 z-50 transition-colors">
+<div class="text-xl font-bold tracking-tight text-blue-950 dark:text-blue-50 font-headline">
+            The Lucid Architect
+        </div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-blue-900 dark:text-blue-100 font-semibold font-manrope text-sm tracking-tight transition-colors" href="#">Recent Chats</a>
+<a class="text-slate-500 dark:text-slate-400 font-manrope text-sm font-medium tracking-tight hover:bg-slate-200/50 dark:hover:bg-slate-800/50 px-3 py-2 rounded-lg transition-all" href="#">Documents</a>
+<a class="text-slate-500 dark:text-slate-400 font-manrope text-sm font-medium tracking-tight hover:bg-slate-200/50 dark:hover:bg-slate-800/50 px-3 py-2 rounded-lg transition-all" href="#">Library</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 p-2 rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 p-2 rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<aside class="hidden lg:flex fixed left-0 top-0 h-full w-72 flex-col py-8 gap-6 bg-slate-100 dark:bg-slate-950 border-r border-transparent z-40">
+<div class="px-8 mb-4">
+<div class="text-lg font-black text-blue-900 dark:text-blue-100 font-headline">The Architect</div>
+<div class="text-xs text-on-surface-variant font-medium tracking-widest uppercase">Editorial Intelligence</div>
+</div>
+<button class="mx-6 liquid-gradient text-on-primary py-3 rounded-md font-semibold text-sm shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+            New Summary
+        </button>
+<nav class="flex flex-col gap-1 px-2">
+<a class="flex items-center gap-3 text-blue-900 dark:text-blue-200 font-semibold border-l-4 border-blue-900 dark:border-blue-400 pl-4 py-3 hover:translate-x-1 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-manrope text-sm">Recent Chats</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-3 hover:text-blue-800 dark:hover:text-blue-100 hover:translate-x-1 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-manrope text-sm">Documents</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-3 hover:text-blue-800 dark:hover:text-blue-100 hover:translate-x-1 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-manrope text-sm">Library</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-3 hover:text-blue-800 dark:hover:text-blue-100 hover:translate-x-1 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-manrope text-sm">Insights</span>
+</a>
+</nav>
+<div class="mt-auto px-2 flex flex-col gap-1">
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-3 hover:text-blue-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-manrope text-sm">Help</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 pl-5 py-3 hover:text-blue-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span class="font-manrope text-sm">Archive</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pt-24 lg:pl-80 pr-6 pb-12 min-h-screen">
+<div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Hero & Upload Section (65%) -->
+<div class="lg:col-span-8 flex flex-col gap-8">
+<section>
+<h1 class="text-5xl font-extrabold font-headline text-on-surface tracking-tight mb-4">
+                        Distill Complexity into <span class="text-primary-container">Clarity.</span>
+</h1>
+<p class="text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+                        The Lucid Architect transforms dense documents and recordings into polished editorial insights. Upload your sources to begin the synthesis.
+                    </p>
+</section>
+<!-- File Upload Zone -->
+<section class="bg-surface-container-high rounded-full p-12 transition-all group relative overflow-hidden flex flex-col items-center justify-center min-h-[400px] border-none">
+<div class="absolute inset-0 bg-primary-fixed opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+<div class="relative z-10 flex flex-col items-center text-center gap-6">
+<div class="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center editorial-shadow">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="cloud_upload">cloud_upload</span>
+</div>
+<div>
+<h3 class="text-2xl font-bold font-headline text-on-surface mb-2">Drag and drop your narrative</h3>
+<p class="text-on-surface-variant">Support for PDF, TXT, DOCX, PPT, and MP3 archives</p>
+</div>
+<div class="flex gap-4 mt-4">
+<button class="liquid-gradient text-on-primary px-8 py-3 rounded-md font-semibold text-sm shadow-lg active:scale-95 transition-transform">
+                                Browse Files
+                            </button>
+<button class="bg-surface-container-lowest text-on-surface px-8 py-3 rounded-md font-semibold text-sm editorial-shadow hover:bg-surface-dim transition-colors">
+                                Paste URL
+                            </button>
+</div>
+</div>
+<!-- Decorative Floating Icons -->
+<div class="absolute bottom-6 right-8 flex gap-3 opacity-30 grayscale hover:grayscale-0 transition-all duration-500">
+<span class="material-symbols-outlined text-3xl" data-icon="picture_as_pdf">picture_as_pdf</span>
+<span class="material-symbols-outlined text-3xl" data-icon="audio_file">audio_file</span>
+<span class="material-symbols-outlined text-3xl" data-icon="article">article</span>
+<span class="material-symbols-outlined text-3xl" data-icon="slideshow">slideshow</span>
+</div>
+</section>
+<!-- Recent Uploads (Bento Style) -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-bold font-headline text-on-surface">Recent Intelligence</h2>
+<button class="text-sm font-semibold text-primary-container hover:underline">View All Archive</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-full editorial-shadow flex gap-4 items-start hover:translate-y-[-4px] transition-all cursor-pointer">
+<div class="bg-secondary-container p-3 rounded-xl flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<div class="flex-1">
+<div class="text-sm font-bold text-on-surface truncate">Q3 Market Analysis_Final.pdf</div>
+<div class="text-xs text-on-surface-variant mt-1">Uploaded 2 hours ago • 4.2 MB</div>
+<div class="mt-4 flex gap-2">
+<span class="px-2 py-1 bg-surface-container-low text-[10px] font-bold uppercase tracking-wider rounded">Financial</span>
+<span class="px-2 py-1 bg-surface-container-low text-[10px] font-bold uppercase tracking-wider rounded">Strategy</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-full editorial-shadow flex gap-4 items-start hover:translate-y-[-4px] transition-all cursor-pointer">
+<div class="bg-tertiary-fixed p-3 rounded-xl flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+</div>
+<div class="flex-1">
+<div class="text-sm font-bold text-on-surface truncate">Stakeholder Interview 04.mp3</div>
+<div class="text-xs text-on-surface-variant mt-1">Uploaded yesterday • 12.8 MB</div>
+<div class="mt-4 flex gap-2">
+<span class="px-2 py-1 bg-surface-container-low text-[10px] font-bold uppercase tracking-wider rounded">Audio</span>
+<span class="px-2 py-1 bg-surface-container-low text-[10px] font-bold uppercase tracking-wider rounded">Transcript</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar Insights Section (35%) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- Getting Started CTA -->
+<div class="bg-primary text-on-primary p-8 rounded-full shadow-2xl relative overflow-hidden">
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-primary-container rounded-full opacity-50 blur-3xl"></div>
+<h3 class="text-xl font-bold font-headline mb-4 relative z-10">New to The Architect?</h3>
+<p class="text-sm opacity-80 mb-6 relative z-10 leading-relaxed">
+                        Experience our premium summary engine. The first five document syntheses are on the house.
+                    </p>
+<button class="w-full bg-surface-container-lowest text-primary py-3 rounded-md font-bold text-sm hover:bg-surface-bright transition-colors relative z-10">
+                        Start Free Trial
+                    </button>
+</div>
+<!-- Featured Insight / Educational Content -->
+<div class="bg-surface-container-low p-8 rounded-full flex flex-col gap-6">
+<h4 class="text-xs font-black uppercase tracking-[0.2em] text-primary-container">Editorial Tips</h4>
+<div class="flex flex-col gap-6">
+<div class="group cursor-pointer">
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">How we handle long-form audio</div>
+<p class="text-xs text-on-surface-variant mt-2 leading-relaxed">Our neural engine identifies speaker sentiment and key timestamps automatically.</p>
+</div>
+<div class="h-px bg-outline-variant opacity-20"></div>
+<div class="group cursor-pointer">
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Cross-document synthesis</div>
+<p class="text-xs text-on-surface-variant mt-2 leading-relaxed">Upload multiple PDFs to find overlapping themes and contradictory evidence.</p>
+</div>
+</div>
+</div>
+<!-- Visual Accent -->
+<div class="h-64 rounded-full overflow-hidden relative shadow-lg">
+<img alt="Modern workspace" class="w-full h-full object-cover" data-alt="Minimalist architectural office space with high ceilings, soft morning sunlight, and clean desk setups reflecting professional clarity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwdf_r_eLsl46nCbmzVfiE_uKk-yVYaB0LsGzuBltMKcXRmKhTWhDUCKhXpppicVljQ3IpQ9h93hiMNzDIzVJLldFrjINrQwdIc6TiuqeuwsPeM8pJbYLqlwiR5fYnuKmd_vysVCHFJXZqWXk92GA01QP8QMy-q1zqovvjfCoob_FqpvJSATv4lm3NPILBrw4soA_wed7JD27JInyH7OFcbWvMQvezB_eykuhCcYLzDbgWs4LU40xOD_KFm9PmqJFDgbJCwcuQXzo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent flex flex-col justify-end p-6">
+<p class="text-white text-xs font-medium italic">"Precision is the hallmark of editorial excellence."</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB (Suppressed on Landing per rule, but present for dashboard context if needed) -->
+<!-- Suppressing FAB on Landing Page per Shell Visibility & Relevance instructions -->
+</body></html>

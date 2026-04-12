@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Transcript View - The Lucid Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#e0e3e5",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-secondary-container": "#4e6874",
+                    "background": "#f7f9fb",
+                    "on-background": "#191c1e",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "inverse-surface": "#2d3133",
+                    "surface-tint": "#3a5f94",
+                    "on-error-container": "#93000a",
+                    "primary-container": "#264c80",
+                    "on-surface-variant": "#424751",
+                    "outline-variant": "#c2c6d3",
+                    "on-primary-container": "#9abef9",
+                    "on-tertiary-fixed": "#351000",
+                    "on-surface": "#191c1e",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface-bright": "#f7f9fb",
+                    "surface-container-low": "#f2f4f6",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffdbcc",
+                    "surface-container": "#eceef0",
+                    "on-tertiary-container": "#ffa77e",
+                    "surface-container-high": "#e6e8ea",
+                    "secondary-fixed": "#cbe7f5",
+                    "tertiary-fixed-dim": "#ffb694",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "on-secondary-fixed": "#021f29",
+                    "on-primary-fixed-variant": "#1f477b",
+                    "primary-fixed": "#d5e3ff",
+                    "surface": "#f7f9fb",
+                    "inverse-primary": "#a7c8ff",
+                    "on-primary-fixed": "#001b3c",
+                    "tertiary-container": "#833301",
+                    "outline": "#737783",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "primary-fixed-dim": "#a7c8ff",
+                    "primary": "#043568",
+                    "tertiary": "#5f2200",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#48626e",
+                    "secondary-container": "#cbe7f5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-shadow {
+            box-shadow: 0 8px 32px 0 rgba(25, 28, 30, 0.04);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+        .waveform-bar {
+            transition: height 0.2s ease;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface">
+<!-- TopNavBar -->
+<nav class="flex justify-between items-center w-full px-8 h-16 sticky top-0 z-50 bg-slate-50 dark:bg-slate-900">
+<div class="text-xl font-bold text-blue-900 dark:text-blue-100 tracking-wider font-manrope">The Lucid Architect</div>
+<div class="flex-1 max-w-xl mx-12">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-slate-400">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20" placeholder="Search transcripts..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-6 space-y-8 z-40 bg-slate-50 dark:bg-slate-900 w-64 pt-20">
+<div class="space-y-1">
+<div class="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-widest">Workspace</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 hover:text-blue-800 dark:hover:text-blue-100 transition-all px-3 py-2.5 rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-inter text-sm font-medium">Library</span>
+</a>
+<a class="flex items-center gap-3 text-blue-900 dark:text-blue-100 font-semibold before:content-[''] before:w-1 before:h-6 before:bg-blue-900 before:absolute before:left-0 px-3 py-2.5 rounded-lg relative" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-inter text-sm font-medium">Transcripts</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 hover:text-blue-800 dark:hover:text-blue-100 transition-all px-3 py-2.5 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-inter text-sm font-medium">Summaries</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 hover:text-blue-800 dark:hover:text-blue-100 transition-all px-3 py-2.5 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-inter text-sm font-medium">AI Chat</span>
+</a>
+</nav>
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-semibold py-3 px-4 rounded-md transition-all flex items-center justify-center gap-2 editorial-shadow">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                New Analysis
+            </button>
+</div>
+<div class="mt-auto space-y-1 border-t border-slate-200 dark:border-slate-800 pt-4">
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 hover:text-blue-800 dark:hover:text-blue-100 transition-all px-3 py-2" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-inter text-sm font-medium">Settings</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 hover:text-blue-800 dark:hover:text-blue-100 transition-all px-3 py-2" href="#">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
+<span class="font-inter text-sm font-medium">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 p-8 flex gap-8 min-h-[calc(100vh-4rem)]">
+<!-- Central Transcript Panel -->
+<div class="flex-1 space-y-8">
+<!-- Header Section -->
+<header class="bg-surface-container-high p-8 rounded-xl relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h1 class="text-3xl font-headline font-extrabold text-on-surface tracking-tight">Stakeholder Interview 04.mp3</h1>
+<div class="flex items-center gap-4 mt-2 text-on-surface-variant font-medium">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 42:15</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_today</span> Oct 24, 2023</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">person</span> 2 Speakers</span>
+</div>
+</div>
+<button class="bg-surface-container-lowest text-on-surface px-4 py-2 rounded-md font-semibold text-sm editorial-shadow flex items-center gap-2">
+<span class="material-symbols-outlined text-base">download</span> Export
+                        </button>
+</div>
+<div class="mt-6 p-4 bg-surface-container-lowest/60 rounded-lg border-l-4 border-primary">
+<h3 class="text-xs font-bold uppercase tracking-widest text-primary mb-1">Executive Summary</h3>
+<p class="text-on-surface-variant leading-relaxed">The interview focuses on the quarterly architectural roadmap. Key topics include technical debt reduction, the integration of edge computing nodes, and a refined timeline for the Lucid cloud migration. Speaker B emphasizes the need for increased redundancy in the regional data centers.</p>
+</div>
+</div>
+</header>
+<!-- Audio Player Bar -->
+<div class="bg-surface-container-lowest p-6 rounded-xl editorial-shadow sticky top-20 z-30">
+<div class="flex flex-col gap-4">
+<!-- Waveform Visual -->
+<div class="h-12 flex items-end gap-[2px] px-2 opacity-80">
+<!-- Mock Waveform -->
+<div class="flex-1 bg-primary/20 h-4 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-6 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-8 rounded-full"></div>
+<div class="flex-1 bg-primary h-10 rounded-full"></div>
+<div class="flex-1 bg-primary h-12 rounded-full"></div>
+<div class="flex-1 bg-primary h-8 rounded-full"></div>
+<div class="flex-1 bg-primary h-4 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-6 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-9 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-5 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-7 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-11 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-6 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-3 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-8 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-10 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-4 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-5 rounded-full"></div>
+<div class="flex-1 bg-primary/20 h-2 rounded-full"></div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-6">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined md-36" style="font-size: 28px;">replay_10</span>
+</button>
+<button class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined md-36" style="font-size: 28px;">forward_10</span>
+</button>
+</div>
+<div class="flex-1 px-8">
+<div class="h-1 bg-surface-container rounded-full relative">
+<div class="absolute left-0 top-0 h-full w-[15%] bg-primary rounded-full"></div>
+<div class="absolute left-[15%] -top-1.5 w-4 h-4 bg-primary rounded-full border-2 border-surface-container-lowest"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] font-bold text-on-surface-variant font-mono">
+<span>06:12</span>
+<span>42:15</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<select class="bg-surface-container-high border-none text-xs font-bold rounded-md py-1 px-2 focus:ring-0">
+<option>1.0x</option>
+<option>1.25x</option>
+<option>1.5x</option>
+<option>2.0x</option>
+</select>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Transcript Section -->
+<section class="bg-surface-container-lowest rounded-xl p-12 space-y-12 editorial-shadow">
+<!-- Segment 1 -->
+<div class="flex gap-8 group">
+<div class="w-20 pt-1">
+<span class="text-xs font-mono font-bold text-primary/40 group-hover:text-primary transition-colors">00:00</span>
+</div>
+<div class="flex-1 space-y-2">
+<div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase">Speaker A</div>
+<p class="text-lg leading-relaxed text-on-surface">Alright, everyone, thank you for joining. Today we're diving into the final architectural review for the Lucid project. We need to be crystal clear on our migration strategy before the end of Q4.</p>
+</div>
+</div>
+<!-- Segment 2 (Highlighted/Active) -->
+<div class="flex gap-8 group bg-primary-fixed/30 -mx-6 p-6 rounded-xl">
+<div class="w-20 pt-1">
+<span class="text-xs font-mono font-bold text-primary">06:12</span>
+</div>
+<div class="flex-1 space-y-2">
+<div class="text-xs font-bold text-primary tracking-widest uppercase">Speaker B</div>
+<p class="text-lg leading-relaxed text-on-surface font-medium">I've reviewed the current redundancy protocols. My concern is that the regional edge nodes aren't properly synced for a failover event of this scale. If we move the database cluster first, we might see a significant latency spike for the users in the APAC region.</p>
+</div>
+</div>
+<!-- Segment 3 -->
+<div class="flex gap-8 group">
+<div class="w-20 pt-1">
+<span class="text-xs font-mono font-bold text-primary/40 group-hover:text-primary transition-colors">08:45</span>
+</div>
+<div class="flex-1 space-y-2">
+<div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase">Speaker A</div>
+<p class="text-lg leading-relaxed text-on-surface">That’s a valid point, Sarah. What if we staggered the migration? Start with the static assets, then move the secondary clusters before touching the main DB. Would that alleviate the latency concerns?</p>
+</div>
+</div>
+<!-- Segment 4 -->
+<div class="flex gap-8 group">
+<div class="w-20 pt-1">
+<span class="text-xs font-mono font-bold text-primary/40 group-hover:text-primary transition-colors">11:20</span>
+</div>
+<div class="flex-1 space-y-2">
+<div class="text-xs font-bold text-on-surface-variant tracking-widest uppercase">Speaker B</div>
+<p class="text-lg leading-relaxed text-on-surface">Possibly. But we'd need to ensure the sync scripts are bulletproof. I'll need the engineering team to run a simulation on the staging environment before we commit to that timeline.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Side Panel: AI Insights -->
+<aside class="w-[380px] flex flex-col gap-6">
+<div class="flex-1 flex flex-col glass-panel rounded-2xl editorial-shadow overflow-hidden border border-white/40">
+<div class="p-6 border-b border-surface-container bg-surface-container-low/50">
+<h2 class="font-headline font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                        AI Insights
+                    </h2>
+<p class="text-xs text-on-surface-variant mt-1">Analyzing audio context...</p>
+</div>
+<div class="flex-1 p-6 space-y-6 overflow-y-auto">
+<!-- Suggested Queries -->
+<div class="space-y-3">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Ask about this audio</p>
+<button class="w-full text-left p-3 text-xs bg-surface-container-lowest rounded-lg border border-surface-container hover:bg-primary-fixed transition-colors">
+                            "What were the main concerns about APAC latency?"
+                        </button>
+<button class="w-full text-left p-3 text-xs bg-surface-container-lowest rounded-lg border border-surface-container hover:bg-primary-fixed transition-colors">
+                            "Summarize Speaker B's stance on the DB cluster."
+                        </button>
+<button class="w-full text-left p-3 text-xs bg-surface-container-lowest rounded-lg border border-surface-container hover:bg-primary-fixed transition-colors">
+                            "List the action items mentioned."
+                        </button>
+</div>
+<!-- Chat History Mockup -->
+<div class="space-y-4">
+<div class="flex flex-col items-end">
+<div class="bg-secondary-container text-on-secondary-container p-3 rounded-xl rounded-br-sm text-sm max-w-[85%]">
+                                Who is Speaker B?
+                            </div>
+</div>
+<div class="flex flex-col items-start">
+<div class="bg-surface-container-lowest p-3 rounded-xl rounded-bl-sm text-sm max-w-[85%] editorial-shadow">
+                                Speaker B is identified as <strong>Sarah</strong>, likely a lead engineer or infrastructure architect, based on her focus on failover protocols and regional latency.
+                            </div>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high/30">
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-lowest border-none rounded-xl py-3 pl-4 pr-12 text-sm focus:ring-2 focus:ring-primary/20 editorial-shadow" placeholder="Type a question..." type="text"/>
+<button class="absolute right-2 p-1.5 bg-primary text-on-primary rounded-lg">
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Contextual Card -->
+<div class="bg-primary p-6 rounded-2xl text-on-primary relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined" style="font-size: 120px;">graphic_eq</span>
+</div>
+<h4 class="font-headline font-bold text-lg mb-2">Key Takeaways</h4>
+<ul class="text-sm space-y-3 text-primary-fixed/80">
+<li class="flex gap-2">
+<span class="material-symbols-outlined text-xs mt-1">check_circle</span>
+                        Latency is the primary blocker for APAC.
+                    </li>
+<li class="flex gap-2">
+<span class="material-symbols-outlined text-xs mt-1">check_circle</span>
+                        Simulations required before Q4 move.
+                    </li>
+<li class="flex gap-2">
+<span class="material-symbols-outlined text-xs mt-1">check_circle</span>
+                        Staggered migration strategy proposed.
+                    </li>
+</ul>
+</div>
+</aside>
+</main>
+</body></html>
