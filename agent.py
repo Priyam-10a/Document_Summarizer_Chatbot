@@ -17,7 +17,7 @@ llm = ChatOllama(
     model="gemma4:31b-cloud",
     temperature=0.3,
 )
-print("✅ Ollama ready!")
+print("[SUCCESS] Ollama ready!")
 
 memory = MemorySaver()
 

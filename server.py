@@ -71,7 +71,14 @@ async def get_current_user(
     payload = verify_token(token_str)
     if not payload:
         raise HTTPException(401, "Invalid or expired token")
-    return {"user_id": payload["sub"], "username": payload["username"]}
+        
+    user_id = payload["sub"]
+    from auth import get_user_by_id
+    user_record = get_user_by_id(user_id)
+    if not user_record:
+        raise HTTPException(401, "User no longer exists")
+        
+    return {"user_id": user_record["id"], "username": user_record["username"]}
 
 
 # ── Startup ───────────────────────────────────────────────────────────────────
@@ -80,7 +87,7 @@ async def get_current_user(
 async def startup_event():
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     init_db()
-    print("✅ InferaDoc API started.")
+    print("[SUCCESS] InferaDoc API started.")
 
 
 # ── System ────────────────────────────────────────────────────────────────────

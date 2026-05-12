@@ -24,7 +24,7 @@ def init_users_table():
     cur = conn.cursor()
     try:
         cur.execute("""
-            CREATE TABLE IF NOT EXISTS users (
+            CREATE TABLE IF NOT EXISTS app_users (
                 id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 username    VARCHAR(100) UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL,
@@ -32,7 +32,7 @@ def init_users_table():
             );
         """)
         conn.commit()
-        print("✅ Users table ready.")
+        print("[SUCCESS] Users table ready.")
     finally:
         cur.close()
         conn.close()
@@ -63,6 +63,19 @@ def verify_token(token: str) -> dict | None:
         return None
 
 
+def get_user_by_id(user_id: str) -> dict | None:
+    """Check if a user exists in the database by their ID."""
+    conn = get_conn()
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT id, username FROM app_users WHERE id = %s;", (user_id,))
+        row = cur.fetchone()
+        return dict(row) if row else None
+    finally:
+        cur.close()
+        conn.close()
+
+
 # ── Register / Login ─────────────────────────────────────────────────────────
 
 def register_user(username: str, password: str) -> dict:
@@ -82,7 +95,7 @@ def register_user(username: str, password: str) -> dict:
     cur = conn.cursor()
     try:
         cur.execute(
-            "INSERT INTO users (username, password_hash) VALUES (%s, %s) RETURNING id, username, created_at;",
+            "INSERT INTO app_users (username, password_hash) VALUES (%s, %s) RETURNING id, username, created_at;",
             (username, password_hash),
         )
         user = dict(cur.fetchone())
@@ -112,7 +125,7 @@ def login_user(username: str, password: str) -> dict:
     conn = get_conn()
     cur = conn.cursor()
     try:
-        cur.execute("SELECT id, username, password_hash FROM users WHERE username = %s;", (username,))
+        cur.execute("SELECT id, username, password_hash FROM app_users WHERE username = %s;", (username,))
         row = cur.fetchone()
         if not row:
             raise ValueError("Invalid username or password.")

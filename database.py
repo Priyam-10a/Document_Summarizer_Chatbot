@@ -39,7 +39,7 @@ def init_db():
         cur.execute("""
             CREATE TABLE IF NOT EXISTS conversations (
                 id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                user_id     UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
                 title       VARCHAR(255) NOT NULL DEFAULT 'New Chat',
                 doc_info    JSONB,
                 created_at  TIMESTAMPTZ DEFAULT NOW(),
@@ -80,13 +80,13 @@ def init_db():
         """)
 
         conn.commit()
-        print("✅ Database schema ready.")
+        print("[SUCCESS] Database schema ready.")
     except Exception as e:
         conn.rollback()
         # ivfflat requires data to build the index; ignore that specific error
         if "ivfflat" in str(e) or "lists" in str(e):
             conn.commit()
-            print("✅ Database schema ready (index will be built after data is inserted).")
+            print("[SUCCESS] Database schema ready (index will be built after data is inserted).")
         else:
             raise e
     finally:
@@ -233,7 +233,7 @@ def store_chunks(conv_id: str, chunks: list[str], embeddings: list[list[float]],
             template="(%s, %s, %s::vector, %s, %s)"
         )
         conn.commit()
-        print(f"✅ Stored {len(chunks)} chunks in PostgreSQL.")
+        print(f"[SUCCESS] Stored {len(chunks)} chunks in PostgreSQL.")
     finally:
         cur.close()
         conn.close()
