@@ -136,7 +136,7 @@ def split_into_chunks(text, chunk_size=500, overlap=50):
         chunks.append(chunk)
         start += chunk_size - overlap  # overlap keeps context
 
-    print(f"✅ Split into {len(chunks)} chunks "
+    print(f"[SUCCESS] Split into {len(chunks)} chunks "
           f"({chunk_size} words each, {overlap} word overlap)")
     return chunks
 

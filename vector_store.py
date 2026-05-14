@@ -67,7 +67,7 @@ def embed_and_store(conv_id: str, file_path: str,
 
     source = os.path.basename(file_path)
     store_chunks(conv_id, chunks, all_embeddings, source)
-    print(f"✅ Done — {len(chunks)} chunks stored for conversation {conv_id}")
+    print(f"[SUCCESS] Done — {len(chunks)} chunks stored for conversation {conv_id}")
     return len(chunks)
 
 

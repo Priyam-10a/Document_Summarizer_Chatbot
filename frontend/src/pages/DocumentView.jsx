@@ -158,9 +158,9 @@ export default function DocumentView({ conv, messages, setMessages, convId }) {
                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   </div>
                 ) : (
-                  <div className="bg-surface-container-lowest p-5 rounded-xl shadow-sm relative group editorial-shadow border border-surface-container-high">
+                  <div className="bg-surface-container-lowest p-5 rounded-xl shadow-sm relative group editorial-shadow border border-surface-container-high overflow-hidden">
                     <div className="absolute top-0 left-0 w-1 h-8 editorial-gradient rounded-full -ml-0.5"></div>
-                    <div className="text-sm leading-relaxed text-on-surface prose prose-sm prose-slate dark:prose-invert max-w-none">
+                    <div className="text-sm leading-relaxed text-on-surface prose prose-sm prose-slate dark:prose-invert max-w-none overflow-x-auto">
                       <ReactMarkdown 
                         remarkPlugins={[remarkGfm, remarkMath]}
                         rehypePlugins={[rehypeKatex]}
